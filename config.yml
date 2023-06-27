@@ -1,0 +1,9 @@
+ml_training:
+  directory: models
+  storage: 500M
+workers:
+  number: 25
+logging:
+  directory: logs
+  storage: 10M
+  truncate: 1000
