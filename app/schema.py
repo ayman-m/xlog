@@ -112,6 +112,7 @@ class Query:
 
         """
         global workers
+        observables_obj = None
         active_workers = {}
         for worker_id, worker in workers.items():
             if worker.status == 'Running':
@@ -121,13 +122,31 @@ class Query:
             raise Exception("All workers are busy, please stop a running worker.")
         now = datetime.datetime.now()
         worker_name = f"worker_{now.strftime('%Y%m%d%H%M%S')}"
-        created_at = now
+        observables = request_input.observables_dict
+        if request_input.observables_dict:
+            incident_types, analysts, severity, terms, src_host, user, process, cmd, dst_ip, protocol, url, \
+                dst_port, action, event_id, src_ip, file_hash, techniques, error_code, file_name, cve = \
+                observables.get('incident_types', None), observables.get('analysts', None),\
+                observables.get('severity', None), observables.get('terms', None), \
+                observables.get('src_host', None), observables.get('user', None), observables.get('process', None), \
+                observables.get('cmd', None), observables.get('dst_ip', None), observables.get('protocol', None), \
+                observables.get('url', None), observables.get('dst_port', None), observables.get('action', None), \
+                observables.get('event_id', None), observables.get('src_ip', None), \
+                observables.get('file_hash', None), observables.get('techniques', None), \
+                observables.get('error_code', None), observables.get('file_name', None), \
+                observables.get('cve', None)
+            observables_obj = Observables(incident_types=incident_types, analysts=analysts, severity=severity,
+                                          terms=terms, src_host=src_host, user=user, process=process, cmd=cmd,
+                                          dst_ip=dst_ip, protocol=protocol, url=url, port=dst_port, action=action,
+                                          event_id=event_id, src_ip=src_ip, file_hash=file_hash,
+                                          technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
         data_worker = Sender(worker_name=worker_name, data_type=request_input.type, count=request_input.count,
-                             destination=request_input.destination, observables=request_input.observables_dict,
+                             destination=request_input.destination, observables=observables_obj,
                              interval=request_input.interval)
         workers[worker_name] = data_worker
         data_worker.start()
         return DataWorkerOutput(type=data_worker.data_type, worker=data_worker.worker_name, status=data_worker.status,
+                                count=data_worker.count, interval=data_worker.interval,
                                 destination=data_worker.destination, createdAt=str(data_worker.created_at))
 
     @strawberry.field(description="Get a list of data workers.")

@@ -8,39 +8,37 @@
 ![codeql](https://github.com/my-soc/Rosetta/actions/workflows/github-code-scanning/codeql/badge.svg)
 [![slack-community](https://img.shields.io/badge/Slack-4A154C?logo=slack&logoColor=white)](https://go-rosetta.slack.com)
 
-<img  align="left" src="img/rosetta-logo.svg" width="30%" alt="Rosetta"> 
+<img  align="left" src="img/xlog-logo.svg" width="30%" alt="Rosetta"> 
 
 # XLog
 XLog is a tool to help you fake log messages. The main interface to the tool is a GraphQL API service with query capabilities to automate the following:
 - Fake log messages in different formats.
 - Run a worker to send those messages to your detection tools.
+***
+## Usage
+You can run XLog in several ways:
 
-
-## Installation
-
+### Option (1) - Installation
 - Clone the repository.
 - Install the required packages using `pip install -r requirements.txt`. 
 - Start the server using  `uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload.`
 
-## Run Your Container
-
+### Option (2) - Run Your Container
 - Build the image `docker build -t xlog`
 - Run the image `docker run --name xlog -p 8000:8000 -d rosetta`
 
-## Run a Ready Container
+### Option (3) - Run a Ready Container
 - You can run a ready container: `docker run --name xlog -p 8000:8000 -d aymanam/xlog:latest`
-
+***
 ## Available Queries
-
 You can use the built-in GraphiQL in-browser tool `http://[xlog-address]:[port]` for writing, validating, and
 testing your GraphQL queries. Type queries into this side of the screen, and you will see intelligent typeaheads aware of the current GraphQL type schema and live syntax and  validation errors highlighted within the text.
-
 You can also click on the Explorer page to view a list of the available queries:
 
-### Log Fakers
+### 1 - Log Fakers
 `generateFakeData` query can be used to generate fake logs in different log formats.
 
-#### Generate Fake Syslog Messages
+#### 1.1 - Generate Fake Syslog Messages
 ***
 The simplest query to generate random syslog message, the message represent a fake risky command execution on a unix server.
 
@@ -143,7 +141,7 @@ Example output:
 ```
 ***
 
-#### Generate Fake CEF Messages
+#### 1.2 - Generate Fake CEF Messages
 ***
 The simplest query to generate random CEF message, the message represent a firewall access log entry.
 
@@ -249,7 +247,7 @@ Example output:
 ***
 
 
-#### Generate Fake LEEF Messages
+#### 1.3 - Generate Fake LEEF Messages
 ***
 The simplest query to generate random LEEF message, the message represent an application access log entry.
 
@@ -353,7 +351,7 @@ Example output:
 ***
 
 
-#### Generate Fake WinEvent Messages
+#### 1.4 - Generate Fake WinEvent Messages
 ***
 The simplest query to generate random WinEvent message, the message represent a Windows Event entry.
 
@@ -458,7 +456,7 @@ Example output:
 ***
 
 
-#### Generate Fake JSON Messages
+#### 1.5 - Generate Fake JSON Messages
 ***
 The simplest query to generate random JSON message, the message represent a Vulnerability Found entry.
 
@@ -625,7 +623,7 @@ Example output:
 ***
 
 
-#### Generate Fake Incident Messages
+#### 1.6 - Generate Fake Incident Messages
 ***
 The simplest query to generate random Incident.
 

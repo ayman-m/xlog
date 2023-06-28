@@ -1,6 +1,7 @@
 import strawberry
 from enum import Enum
 from typing import Optional, List
+from strawberry.scalars import JSON
 
 
 @strawberry.enum(description="Enum representing the types of workers.")
@@ -22,10 +23,10 @@ class WorkerActionEnum(Enum):
 class DataWorkerCreateInput:
     type: WorkerTypeEnum
     count: int = 1
-    destination: str
-    fields: Optional[List[str]] = None
-    observables_list: Optional[List[str]] = None
     interval: int = 2
+    destination: str
+    fields: Optional[str] = None
+    observables_dict: Optional[JSON] = None
 
 
 @strawberry.input(description="Input object for performing an action on a data worker.")
@@ -39,6 +40,8 @@ class DataWorkerOutput:
     type: WorkerTypeEnum
     worker: str
     status: str
+    count: str
+    interval: str
     destination: str
     createdAt: str
 
