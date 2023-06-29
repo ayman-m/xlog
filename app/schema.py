@@ -1,11 +1,9 @@
 import datetime
-import time
-import json
 from typing import List
 import strawberry
 
 from app.config import Config
-from rosetta import Events, ObservableType, ObservableKnown, Observables, Sender, WorkerTypeEnum
+from rosetta import Events, Observables, Sender
 
 from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput
 from app.types.sender import WorkerActionEnum, DataWorkerCreateInput, DataWorkerActionInput, DataWorkerOutput, \
@@ -53,7 +51,7 @@ class Query:
         elif request_input.type == FakerTypeEnum.LEEF:
             if request_input.observables_dict:
                 src_host, src_ip, file_hash, techniques, error_code = observables.get('src_host', None), \
-                    observables.get('src_ip', None),observables.get('file_hash', None),\
+                    observables.get('src_ip', None), observables.get('file_hash', None),\
                     observables.get('techniques', None), observables.get('error_code', None)
                 observables_obj = Observables(src_host=src_host, src_ip=src_ip, technique=techniques,
                                               file_hash=file_hash, error_code=error_code)
@@ -112,7 +110,6 @@ class Query:
 
         """
         global workers
-        observables_obj = None
         active_workers = {}
         for worker_id, worker in workers.items():
             if worker.status == 'Running':
@@ -121,6 +118,11 @@ class Query:
         if len(workers.keys()) >= int(Config.WORKERS_NUMBER):
             raise Exception("All workers are busy, please stop a running worker.")
         now = datetime.datetime.now()
+        observables_obj = None
+        if request_input.timestamp:
+            datetime_obj = datetime.datetime.strptime(request_input.timestamp, "%Y-%m-%d %H:%M:%S")
+        else:
+            datetime_obj = None
         worker_name = f"worker_{now.strftime('%Y%m%d%H%M%S')}"
         observables = request_input.observables_dict
         if request_input.observables_dict:
@@ -140,14 +142,16 @@ class Query:
                                           dst_ip=dst_ip, protocol=protocol, url=url, port=dst_port, action=action,
                                           event_id=event_id, src_ip=src_ip, file_hash=file_hash,
                                           technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
-        data_worker = Sender(worker_name=worker_name, data_type=request_input.type, count=request_input.count,
-                             destination=request_input.destination, observables=observables_obj,
-                             interval=request_input.interval)
+        data_worker = Sender(worker_name=worker_name, data_type=request_input.type.name,
+                             count=int(request_input.count), destination=request_input.destination,
+                             observables=observables_obj, interval=int(request_input.interval),
+                             datetime_obj=datetime_obj)
         workers[worker_name] = data_worker
         data_worker.start()
         return DataWorkerOutput(type=data_worker.data_type, worker=data_worker.worker_name, status=data_worker.status,
                                 count=data_worker.count, interval=data_worker.interval,
-                                destination=data_worker.destination, createdAt=str(data_worker.created_at))
+                                destination=data_worker.destination, verifySsl=str(data_worker.verify_ssl),
+                                createdAt=str(data_worker.created_at))
 
     @strawberry.field(description="Get a list of data workers.")
     def data_worker_list(self) -> List[DataWorkerOutput]:
@@ -161,7 +165,10 @@ class Query:
         workers_data = []
         for worker in workers.keys():
             workers_data.append(DataWorkerOutput(type=workers[worker].data_type, worker=workers[worker].worker_name,
-                                                 status=workers[worker].status, destination=workers[worker].destination,
+                                                 status=workers[worker].status, count=workers[worker].count,
+                                                 interval=workers[worker].interval,
+                                                 verifySsl=workers[worker].verify_ssl,
+                                                 destination=workers[worker].destination,
                                                  createdAt=str(workers[worker].created_at)))
         return workers_data
 
@@ -189,5 +196,3 @@ class Query:
 
 
 schema = strawberry.Schema(query=Query)
-
-

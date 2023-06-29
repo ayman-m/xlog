@@ -852,3 +852,88 @@ Example output:
 }
 ```
 ***
+
+### 2 - Log Sender
+`dataWorkerCreate` query can be used to create a new worker to send the faked logs to a destination detection tool.
+
+#### 1.1 - Create a UDP Worker 
+***
+The simplest query to generate random syslog message and sending to over UDP.
+
+##### A curl example:
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629095100",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "4",
+            "interval": "2",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 09:51:00.626856"
+        }
+    }
+}
+```
+#### 1.1 - Create a UDP Worker 
+***
+The simplest query to generate random syslog message and sending to over UDP.
+
+##### A curl example:
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629095100",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "4",
+            "interval": "2",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 09:51:00.626856"
+        }
+    }
+}
+```
+PCAP:
+<img  align="left" src="img/syslog-simple.png" width="100%" alt="Worker Simple"> 
+
+***
+If you want to set a timestamp to start from, you can set the timestamp input to a datatime formatted string, example "2022-01-01 12:00:00".
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $timestamp: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, timestamp: $timestamp}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2,"timestamp":"2022-01-01 12:00:00"}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629095521",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "4",
+            "interval": "2",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 09:55:21.781220"
+        }
+    }
+}
+```
+***
