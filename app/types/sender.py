@@ -11,7 +11,7 @@ class WorkerTypeEnum(Enum):
     LEEF = 'leef'
     WINEVENT = 'winevent'
     JSON = 'json'
-    Incident = 'incident'
+    INCIDENT = 'incident'
 
 
 @strawberry.enum(description="Enum representing the actions for a worker.")
@@ -27,8 +27,12 @@ class DataWorkerCreateInput:
     interval: int = 2
     destination: str
     fields: Optional[str] = None
+    vendor: Optional[str] = None
+    product: Optional[str] = None
+    version: Optional[str] = None
     observables_dict: Optional[JSON] = None
     timestamp: Optional[str] = None
+    verify_ssl: Optional[bool] = False
 
 
 @strawberry.input(description="Input object for performing an action on a data worker.")

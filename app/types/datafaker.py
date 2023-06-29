@@ -17,6 +17,9 @@ class FakerTypeEnum(Enum):
 @strawberry.input(description="Input object for generating fake data.")
 class DataFakerInput:
     type: FakerTypeEnum
+    vendor: Optional[str] = None
+    product: Optional[str] = None
+    version: Optional[str] = None
     count: Optional[int] = 1
     timestamp: Optional[str] = None
     fields: Optional[str] = None

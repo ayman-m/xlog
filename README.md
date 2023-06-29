@@ -857,6 +857,7 @@ Example output:
 `dataWorkerCreate` query can be used to create a new worker to send the faked logs to a destination detection tool.
 
 #### 1.1 - Create a UDP Worker 
+You can use the UDP worker for sending generic Syslog, CEF and LEEF Messages.
 ***
 The simplest query to generate random syslog message and sending to over UDP.
 
@@ -909,8 +910,66 @@ Example output:
 }
 ```
 PCAP:
-<img  align="left" src="img/syslog-simple.png" width="100%" alt="Worker Simple"> 
+<img  align="left" src="img/worker-simple.png" width="100%" alt="Worker Simple">
+***
+***
+If you want to fake multiple log entries, you can set the count input to an int.
+##### A curl example:
 
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":2}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629134154",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "1",
+            "interval": "2",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 13:41:54.660233"
+        }
+    }
+}
+```
+PCAP:
+<img  align="left" src="img/worker-count-1.png" width="100%" alt="Worker Count 1">
+<img  align="left" src="img/worker-count-2.png" width="100%" alt="Worker Count 2">
+***
+***
+If you want to fake set the interval between sent log entries, you can set the interval input to an int.
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $interval: Int!, $count: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":2,"interval":5}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629135734",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "1",
+            "interval": "5",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 13:57:34.940563"
+        }
+    }
+}
+```
+PCAP:
+<img  align="left" src="img/worker-interval-1.png" width="100%" alt="Worker Interval 1">
+<img  align="left" src="img/worker-interval-2.png" width="100%" alt="Worker Interval 2">
+***
 ***
 If you want to set a timestamp to start from, you can set the timestamp input to a datatime formatted string, example "2022-01-01 12:00:00".
 ##### A curl example:
@@ -918,20 +977,128 @@ If you want to set a timestamp to start from, you can set the timestamp input to
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $timestamp: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, timestamp: $timestamp}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2,"timestamp":"2022-01-01 12:00:00"}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $timestamp: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, timestamp: $timestamp}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","timestamp":"2022-01-01 12:00:00"}}'
 ```
 Example output:
 ```json
 {
     "data": {
         "dataWorkerCreate": {
-            "worker": "worker_20230629095521",
+            "worker": "worker_20230629140330",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "0",
+            "interval": "2",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 14:03:30.748572"
+        }
+    }
+}
+```
+PCAP:
+<img  align="left" src="img/worker-timestamp.png" width="100%" alt="Worker Timestamp">
+***
+***
+If you want to set an observables object, you can use the observablesDict input, below are all the types of observables that you can use in your dict, please review the supported observables for each log type:
+- incident_types
+- analysts
+- severity
+- terms
+- src_host
+- user
+- process
+- cmd
+- dst_ip
+- protocol
+- url
+- port
+- action
+- event_id
+- src_ip
+- file_hash
+- technique
+- error_code
+- file_name
+- cve
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $observablesDict: JSON!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, observablesDict: $observablesDict}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","observablesDict":{"src_host":["test12","test32"]}}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629141531",
+            "type": "SYSLOG",
+            "status": "Running",
+            "count": "0",
+            "interval": "2",
+            "destination": "udp:127.0.0.1:514",
+            "createdAt": "2023-06-29 14:15:31.069035"
+        }
+    }
+}
+```
+PCAP:
+<img  align="left" src="img/worker-observables.png" width="100%" alt="Worker Observables">
+***
+***
+#### 1.2 - Create a TCP Worker 
+You can use the TCP worker for sending generic Syslog, CEF and LEEF Messages.
+***
+You can use same query options that include count, interval, timestamp and observables; Please refer to the above examples.
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"tcp:127.0.0.1:514","count":5,"interval":2}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629140642",
             "type": "SYSLOG",
             "status": "Running",
             "count": "4",
             "interval": "2",
-            "destination": "udp:127.0.0.1:514",
-            "createdAt": "2023-06-29 09:55:21.781220"
+            "destination": "tcp:127.0.0.1:514",
+            "createdAt": "2023-06-29 14:06:42.089409"
+        }
+    }
+}
+```
+***
+#### 1.2 - Create a Webhook Worker 
+You can use the Webhook worker for sending JSON and Incident Messages.
+***
+You can use same query options that include count, interval, timestamp, observables, fields and verify_ssl; Please refer to the above examples.
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!,$fields: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, fields: $fields}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}","variables":{"type":"JSON","destination":"https://webhook-service.local","count":3,"interval":2,"fields":"id,type,duration,analyst,severity,description,events"}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "dataWorkerCreate": {
+            "worker": "worker_20230629144632",
+            "type": "JSON",
+            "status": "Running",
+            "count": "2",
+            "interval": "2",
+            "destination": "https://webhook-service.local",
+            "verifySsl": "False",
+            "createdAt": "2023-06-29 14:46:32.622369"
         }
     }
 }

@@ -33,12 +33,13 @@ class Query:
         else:
             datetime_obj = None
         observables = request_input.observables_dict
+        vendor = request_input.vendor or "XLog"
         if request_input.type == FakerTypeEnum.SYSLOG:
             if request_input.observables_dict:
                 src_host, user, process, cmd = observables.get('src_host', None), observables.get('user', None), \
                     observables.get('process', None), observables.get('cmd', None)
                 observables_obj = Observables(src_host=src_host, user=user, cmd=cmd, process=process)
-            data = Events.syslog(request_input.count, datetime_obj, observables_obj)
+            data = Events.syslog(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.CEF:
             if request_input.observables_dict:
                 src_host, dst_ip, url, dst_port, protocol, action, event_id = observables.get('src_host', None), \
@@ -47,7 +48,8 @@ class Query:
                     observables.get('event_id', None)
                 observables_obj = Observables(src_host=src_host, dst_ip=dst_ip, url=url,  port=dst_port,
                                               protocol=protocol, action=action, event_id=event_id)
-            data = Events.cef(request_input.count, datetime_obj, observables_obj)
+            data = Events.cef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
+                              vendor=vendor, product=request_input.product, version=request_input.version)
         elif request_input.type == FakerTypeEnum.LEEF:
             if request_input.observables_dict:
                 src_host, src_ip, file_hash, techniques, error_code = observables.get('src_host', None), \
@@ -55,7 +57,8 @@ class Query:
                     observables.get('techniques', None), observables.get('error_code', None)
                 observables_obj = Observables(src_host=src_host, src_ip=src_ip, technique=techniques,
                                               file_hash=file_hash, error_code=error_code)
-            data = Events.leef(request_input.count, datetime_obj, observables_obj)
+            data = Events.leef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
+                               vendor=vendor, product=request_input.product, version=request_input.version)
         elif request_input.type == FakerTypeEnum.WINEVENT:
             if request_input.observables_dict:
                 event_id, process, src_host, cmd, src_ip, file_name = observables.get('event_id', None), \
@@ -63,7 +66,7 @@ class Query:
                     observables.get('cmd', None), observables.get('src_ip', None), observables.get('file_name', None)
                 observables_obj = Observables(event_id=event_id, process=process, src_host=src_host,
                                               cmd=cmd, src_ip=src_ip, file_name=file_name)
-            data = Events.winevent(request_input.count, datetime_obj, observables_obj)
+            data = Events.winevent(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.JSON:
             if request_input.observables_dict:
                 cve, src_host, severity, file_hash = observables.get('cve', None), \
@@ -71,7 +74,7 @@ class Query:
                     observables.get('file_hash', None)
                 observables_obj = Observables(cve=cve, src_host=src_host, severity=severity,
                                               file_hash=file_hash)
-            data = Events.json(request_input.count, datetime_obj, observables_obj)
+            data = Events.json(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.Incident:
             if request_input.observables_dict:
                 incident_types, analysts, severity, terms, src_host, user, process, cmd, dst_ip, protocol, url, \
@@ -90,7 +93,8 @@ class Query:
                                               dst_ip=dst_ip, protocol=protocol, url=url, port=dst_port, action=action,
                                               event_id=event_id, src_ip=src_ip, file_hash=file_hash,
                                               technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
-            data = Events.incidents(request_input.count, request_input.fields, observables_obj)
+            data = Events.incidents(count=request_input.count, fields=request_input.fields, timestamp=datetime_obj,
+                                    observables=observables_obj)
         return DataFakerOutput(
             data=data,
             type=request_input.type,
@@ -145,7 +149,8 @@ class Query:
         data_worker = Sender(worker_name=worker_name, data_type=request_input.type.name,
                              count=int(request_input.count), destination=request_input.destination,
                              observables=observables_obj, interval=int(request_input.interval),
-                             datetime_obj=datetime_obj)
+                             datetime_obj=datetime_obj, fields=request_input.fields,
+                             verify_ssl=request_input.verify_ssl)
         workers[worker_name] = data_worker
         data_worker.start()
         return DataWorkerOutput(type=data_worker.data_type, worker=data_worker.worker_name, status=data_worker.status,
