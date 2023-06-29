@@ -94,7 +94,8 @@ class Query:
                                               event_id=event_id, src_ip=src_ip, file_hash=file_hash,
                                               technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
             data = Events.incidents(count=request_input.count, fields=request_input.fields, timestamp=datetime_obj,
-                                    observables=observables_obj)
+                                    observables=observables_obj, vendor=vendor, product=request_input.product,
+                                    version=request_input.version)
         return DataFakerOutput(
             data=data,
             type=request_input.type,
@@ -129,6 +130,7 @@ class Query:
             datetime_obj = None
         worker_name = f"worker_{now.strftime('%Y%m%d%H%M%S')}"
         observables = request_input.observables_dict
+        vendor = request_input.vendor or "XLog"
         if request_input.observables_dict:
             incident_types, analysts, severity, terms, src_host, user, process, cmd, dst_ip, protocol, url, \
                 dst_port, action, event_id, src_ip, file_hash, techniques, error_code, file_name, cve = \
@@ -146,8 +148,10 @@ class Query:
                                           dst_ip=dst_ip, protocol=protocol, url=url, port=dst_port, action=action,
                                           event_id=event_id, src_ip=src_ip, file_hash=file_hash,
                                           technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
+        print (vendor)
         data_worker = Sender(worker_name=worker_name, data_type=request_input.type.name,
                              count=int(request_input.count), destination=request_input.destination,
+                             vendor=vendor, product=request_input.product, version=request_input.version,
                              observables=observables_obj, interval=int(request_input.interval),
                              datetime_obj=datetime_obj, fields=request_input.fields,
                              verify_ssl=request_input.verify_ssl)

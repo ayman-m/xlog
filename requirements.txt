@@ -3,4 +3,4 @@ strawberry-graphql~=0.189.1
 uvicorn~=0.22.0
 PyYAML~=6.0
 starlette~=0.28.0
-rosetta-ce~=1.2.0
+rosetta-ce~=1.3.0
