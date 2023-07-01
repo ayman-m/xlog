@@ -27,72 +27,35 @@ class Query:
 
         """
         data = []
-        observables_obj = None
+        vendor = request_input.vendor or "XLog"
         if request_input.timestamp:
             datetime_obj = datetime.datetime.strptime(request_input.timestamp, "%Y-%m-%d %H:%M:%S")
         else:
             datetime_obj = None
+        observables_init = Observables()
         observables = request_input.observables_dict
-        vendor = request_input.vendor or "XLog"
+        if observables:
+            observables_data = {}
+            for key, value in observables.items():
+                if value is not None and key in observables_init.__dict__:
+                    observables_data[key] = value
+            observables_obj = Observables(**observables_data)
+        else:
+            observables_obj = None
         if request_input.type == FakerTypeEnum.SYSLOG:
-            if request_input.observables_dict:
-                src_host, user, process, cmd = observables.get('src_host', None), observables.get('user', None), \
-                    observables.get('process', None), observables.get('cmd', None)
-                observables_obj = Observables(src_host=src_host, user=user, cmd=cmd, process=process)
             data = Events.syslog(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.CEF:
-            if request_input.observables_dict:
-                src_host, dst_ip, url, dst_port, protocol, action, event_id = observables.get('src_host', None), \
-                    observables.get('dst_ip', None), observables.get('url', None), observables.get('dst_port', None),\
-                    observables.get('protocol', None), observables.get('action', None),\
-                    observables.get('event_id', None)
-                observables_obj = Observables(src_host=src_host, dst_ip=dst_ip, url=url,  port=dst_port,
-                                              protocol=protocol, action=action, event_id=event_id)
             data = Events.cef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
                               vendor=vendor, product=request_input.product, version=request_input.version)
         elif request_input.type == FakerTypeEnum.LEEF:
-            if request_input.observables_dict:
-                src_host, src_ip, file_hash, techniques, error_code = observables.get('src_host', None), \
-                    observables.get('src_ip', None), observables.get('file_hash', None),\
-                    observables.get('techniques', None), observables.get('error_code', None)
-                observables_obj = Observables(src_host=src_host, src_ip=src_ip, technique=techniques,
-                                              file_hash=file_hash, error_code=error_code)
             data = Events.leef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
                                vendor=vendor, product=request_input.product, version=request_input.version)
         elif request_input.type == FakerTypeEnum.WINEVENT:
-            if request_input.observables_dict:
-                event_id, process, src_host, cmd, src_ip, file_name = observables.get('event_id', None), \
-                    observables.get('process', None), observables.get('src_host', None),\
-                    observables.get('cmd', None), observables.get('src_ip', None), observables.get('file_name', None)
-                observables_obj = Observables(event_id=event_id, process=process, src_host=src_host,
-                                              cmd=cmd, src_ip=src_ip, file_name=file_name)
             data = Events.winevent(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.JSON:
-            if request_input.observables_dict:
-                cve, src_host, severity, file_hash = observables.get('cve', None), \
-                    observables.get('src_host', None), observables.get('severity', None),\
-                    observables.get('file_hash', None)
-                observables_obj = Observables(cve=cve, src_host=src_host, severity=severity,
-                                              file_hash=file_hash)
-            data = Events.json(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
+            data = Events.json(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
+                               vendor=vendor, product=request_input.product, version=request_input.version)
         elif request_input.type == FakerTypeEnum.Incident:
-            if request_input.observables_dict:
-                incident_types, analysts, severity, terms, src_host, user, process, cmd, dst_ip, protocol, url, \
-                    dst_port, action, event_id, src_ip, file_hash, techniques, error_code, file_name, cve = \
-                    observables.get('incident_types', None), observables.get('analysts', None), \
-                    observables.get('severity', None), observables.get('terms', None), \
-                    observables.get('src_host', None), observables.get('user', None), observables.get('process', None),\
-                    observables.get('cmd', None), observables.get('dst_ip', None), observables.get('protocol', None),\
-                    observables.get('url', None), observables.get('dst_port', None), observables.get('action', None), \
-                    observables.get('event_id', None), observables.get('src_ip', None), \
-                    observables.get('file_hash', None), observables.get('techniques', None), \
-                    observables.get('error_code', None), observables.get('file_name', None), \
-                    observables.get('cve', None)
-                observables_obj = Observables(incident_types=incident_types, analysts=analysts, severity=severity,
-                                              terms=terms, src_host=src_host, user=user, process=process, cmd=cmd,
-                                              dst_ip=dst_ip, protocol=protocol, url=url, port=dst_port, action=action,
-                                              event_id=event_id, src_ip=src_ip, file_hash=file_hash,
-                                              technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
             data = Events.incidents(count=request_input.count, fields=request_input.fields, timestamp=datetime_obj,
                                     observables=observables_obj, vendor=vendor, product=request_input.product,
                                     version=request_input.version)
