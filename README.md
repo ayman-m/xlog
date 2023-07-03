@@ -8,7 +8,7 @@
 ![codeql](https://github.com/my-soc/Rosetta/actions/workflows/github-code-scanning/codeql/badge.svg)
 [![slack-community](https://img.shields.io/badge/Slack-4A154C?logo=slack&logoColor=white)](https://go-rosetta.slack.com)
 
-<img  align="left" src="img/xlog-logo.svg" width="30%" alt="Rosetta"> 
+<img  align="left" src="img/logo.png" width="30%" alt="Xlog"> 
 
 # XLog
 XLog is a tool to help you generate synthetic log messages. The main interface to the tool is a GraphQL API service with query capabilities to automate the following:
@@ -419,38 +419,9 @@ Example output:
 ### Synthetic Log Sender
 `dataWorkerCreate` query can be used to create a new worker to send the faked logs to a destination detection tool.
 
-#### 1.1 - Create a UDP Worker 
 You can use the UDP worker for sending generic Syslog, CEF and LEEF Messages.
-***
-The simplest query to generate random syslog message and sending to over UDP.
 
-##### A curl example:
-```bash
-curl --location 'http://localhost:8000' \
---header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2}}'
-```
-Example output:
-```json
-{
-    "data": {
-        "dataWorkerCreate": {
-            "worker": "worker_20230629095100",
-            "type": "SYSLOG",
-            "status": "Running",
-            "count": "4",
-            "interval": "2",
-            "destination": "udp:127.0.0.1:514",
-            "createdAt": "2023-06-29 09:51:00.626856"
-        }
-    }
-}
-```
-#### 1.1 - Create a UDP Worker 
-***
-The simplest query to generate random syslog message and sending to over UDP.
-
-##### A curl example:
+**A curl example:**
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
@@ -475,7 +446,7 @@ Example output:
 PCAP:
 <img  align="left" src="img/worker-simple.png" width="100%" alt="Worker Simple">
 ***
-***
+
 If you want to fake multiple log entries, you can set the count input to an int.
 ##### A curl example:
 

@@ -12,6 +12,8 @@ class FakerTypeEnum(Enum):
     WINEVENT = 'winevent'
     JSON = 'json'
     Incident = 'incident'
+    XSIAM_Parsed = 'xsiam_parsed'
+    XSIAM_CEF = 'xsiam_cef'
 
 
 @strawberry.input(description="Input object for generating fake data.")
@@ -24,6 +26,7 @@ class DataFakerInput:
     timestamp: Optional[str] = None
     fields: Optional[str] = None
     observables_dict: Optional[JSON] = None
+    required_fields: Optional[str] = None
 
 
 @strawberry.type(description="Output object containing the generated fake data.")

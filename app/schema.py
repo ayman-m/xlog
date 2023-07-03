@@ -1,13 +1,25 @@
 import datetime
-from typing import List
 import strawberry
+import os
 
+from typing import List
+from pathlib import Path
+from dotenv import load_dotenv
 from app.config import Config
 from rosetta import Events, Observables, Sender
 
 from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput
 from app.types.sender import WorkerActionEnum, DataWorkerCreateInput, DataWorkerActionInput, DataWorkerOutput, \
     DataWorkerStatusOutput
+
+# Load environment variables from .env file if it exists
+env_path = Path('.') / '.env'
+if env_path.exists():
+    load_dotenv()
+XSIAM_URL = os.environ.get("XSIAM_URL")
+XSIAM_ID = os.environ.get("XSIAM_ID")
+XSIAM_KEY = os.environ.get("XSIAM_KEY")
+
 
 workers = {}
 
@@ -34,6 +46,7 @@ class Query:
             datetime_obj = None
         observables_init = Observables()
         observables = request_input.observables_dict
+        required_fields = request_input.required_fields
         if observables:
             observables_data = {}
             for key, value in observables.items():
@@ -43,22 +56,41 @@ class Query:
         else:
             observables_obj = None
         if request_input.type == FakerTypeEnum.SYSLOG:
-            data = Events.syslog(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
+            print(required_fields)
+            data = Events.syslog(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
+                                 required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.CEF:
             data = Events.cef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
-                              vendor=vendor, product=request_input.product, version=request_input.version)
+                              vendor=vendor, product=request_input.product, version=request_input.version,
+                              required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.LEEF:
             data = Events.leef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
-                               vendor=vendor, product=request_input.product, version=request_input.version)
+                               vendor=vendor, product=request_input.product, version=request_input.version,
+                               required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.WINEVENT:
             data = Events.winevent(count=request_input.count, timestamp=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.JSON:
             data = Events.json(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
-                               vendor=vendor, product=request_input.product, version=request_input.version)
+                               vendor=vendor, product=request_input.product, version=request_input.version,
+                               required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.Incident:
             data = Events.incidents(count=request_input.count, fields=request_input.fields, timestamp=datetime_obj,
                                     observables=observables_obj, vendor=vendor, product=request_input.product,
-                                    version=request_input.version)
+                                    version=request_input.version, required_fields=required_fields)
+        elif request_input.type == FakerTypeEnum.XSIAM_Parsed:
+            if observables:
+                observables_data = {}
+                for key, value in observables.items():
+                    if value is not None and key in Config.XSIAM_MANDATORY_PARSED_FIELDS.split(","):
+                        observables_data[key] = value
+                observables_obj = Observables(**observables_data)
+            xsiam_observables = ""
+            raw_data = Events.json(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
+                                   vendor=vendor, product=request_input.product, version=request_input.version)
+
+        elif request_input.type == FakerTypeEnum.XSIAM_CEF:
+            data = Events.cef(count=request_input.count, timestamp=datetime_obj, observables=observables_obj,
+                              vendor=vendor, product=request_input.product, version=request_input.version)
         return DataFakerOutput(
             data=data,
             type=request_input.type,
@@ -95,23 +127,22 @@ class Query:
         observables = request_input.observables_dict
         vendor = request_input.vendor or "XLog"
         if request_input.observables_dict:
-            incident_types, analysts, severity, terms, src_host, user, process, cmd, dst_ip, protocol, url, \
-                dst_port, action, event_id, src_ip, file_hash, techniques, error_code, file_name, cve = \
+            incident_types, analysts, severity, terms, src_host, user, process, cmd, remote_ip, protocol, url, \
+                remote_port, action, event_id, local_ip, file_hash, techniques, error_code, file_name, cve = \
                 observables.get('incident_types', None), observables.get('analysts', None),\
                 observables.get('severity', None), observables.get('terms', None), \
                 observables.get('src_host', None), observables.get('user', None), observables.get('process', None), \
-                observables.get('cmd', None), observables.get('dst_ip', None), observables.get('protocol', None), \
-                observables.get('url', None), observables.get('dst_port', None), observables.get('action', None), \
-                observables.get('event_id', None), observables.get('src_ip', None), \
+                observables.get('cmd', None), observables.get('remote_ip', None), observables.get('protocol', None), \
+                observables.get('url', None), observables.get('remote_port', None), observables.get('action', None), \
+                observables.get('event_id', None), observables.get('local_ip', None), \
                 observables.get('file_hash', None), observables.get('techniques', None), \
                 observables.get('error_code', None), observables.get('file_name', None), \
                 observables.get('cve', None)
             observables_obj = Observables(incident_types=incident_types, analysts=analysts, severity=severity,
                                           terms=terms, src_host=src_host, user=user, process=process, cmd=cmd,
-                                          dst_ip=dst_ip, protocol=protocol, url=url, port=dst_port, action=action,
-                                          event_id=event_id, src_ip=src_ip, file_hash=file_hash,
+                                          remote_ip=remote_ip, protocol=protocol, url=url, port=remote_port, action=action,
+                                          event_id=event_id, local_ip=local_ip, file_hash=file_hash,
                                           technique=techniques, error_code=error_code, file_name=file_name, cve=cve)
-        print (vendor)
         data_worker = Sender(worker_name=worker_name, data_type=request_input.type.name,
                              count=int(request_input.count), destination=request_input.destination,
                              vendor=vendor, product=request_input.product, version=request_input.version,

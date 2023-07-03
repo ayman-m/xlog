@@ -7,3 +7,6 @@ logging:
   directory: logs
   storage: 10M
   truncate: 1000
+xsiam:
+  mandatory_parsed_fields: remote_ip,remote_port,local_ip,local_port,event_timestamp,severity,alert_name
+  optional_parsed_fields: alert_description,action_status,local_ip_v6,remote_ip_v6
