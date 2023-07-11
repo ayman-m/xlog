@@ -23,7 +23,7 @@ class DataFakerInput:
     product: Optional[str] = None
     version: Optional[str] = None
     count: Optional[int] = 1
-    timestamp: Optional[str] = None
+    datetime_iso: Optional[str] = None
     fields: Optional[str] = None
     observables_dict: Optional[JSON] = None
     required_fields: Optional[str] = None

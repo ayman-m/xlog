@@ -11,7 +11,9 @@ class WorkerTypeEnum(Enum):
     LEEF = 'leef'
     WINEVENT = 'winevent'
     JSON = 'json'
-    INCIDENT = 'incident'
+    Incident = 'incident'
+    XSIAM_Parsed = 'xsiam_parsed'
+    XSIAM_CEF = 'xsiam_cef'
 
 
 @strawberry.enum(description="Enum representing the actions for a worker.")
@@ -31,7 +33,19 @@ class DataWorkerCreateInput:
     product: Optional[str] = None
     version: Optional[str] = None
     observables_dict: Optional[JSON] = None
-    timestamp: Optional[str] = None
+    required_fields: Optional[str] = None
+    datetime_iso: Optional[str] = None
+    verify_ssl: Optional[bool] = False
+
+
+@strawberry.input(description="Input object for creating a scenario worker.")
+class ScenarioWorkerCreateInput:
+    count: int = 1
+    interval: int = 2
+    scenario: str
+    destination: str
+    vendor: Optional[str] = None
+    datetime_iso: Optional[str] = None
     verify_ssl: Optional[bool] = False
 
 
@@ -42,7 +56,7 @@ class DataWorkerActionInput:
 
 
 @strawberry.type(description="Output object containing information about a data worker.")
-class DataWorkerOutput:
+class WorkerOutput:
     type: str
     worker: str
     status: str
@@ -54,6 +68,6 @@ class DataWorkerOutput:
 
 
 @strawberry.type(description="Output object containing status information about a data worker.")
-class DataWorkerStatusOutput:
+class WorkerStatusOutput:
     worker: str
     status: str
