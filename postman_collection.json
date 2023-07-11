@@ -1,0 +1,1839 @@
+{
+	"info": {
+		"_postman_id": "b3227aa1-8326-4bc4-8bbe-b8615d7f22c3",
+		"name": "XLog",
+		"description": "```\nRosetta is a tiny GraphQL API service to fake log messages in different formats and convert between those formats.\n\n```",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13827492",
+		"_collection_link": "https://crimson-comet-138966.postman.co/workspace/SOAR~3d68fdbd-8009-460c-8359-503fc0eb0905/collection/13827492-b3227aa1-8326-4bc4-8bbe-b8615d7f22c3?action=share&creator=13827492&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "Worker",
+			"item": [
+				{
+					"name": "Actions",
+					"item": [
+						{
+							"name": "Stop Worker",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery ($worker: String!, $action: WorkerActionEnum!) {\n  workerAction(requestInput: {worker: $worker, action: $action}) {\n    status\n    worker\n  }\n}",
+										"variables": "{\n  \"worker\": \"worker_20230407155158\",\n  \"action\": \"Stop\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Status Worker",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery ($worker: String!, $action: WorkerActionEnum!) {\n  workerAction(requestInput: {worker: $worker, action: $action}) {\n    status\n    worker\n  }\n}",
+										"variables": "{\n  \"worker\": \"worker_20230628082447\",\n  \"action\": \"STATUS\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "List Workers",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery {\n  workerList {\n    destination\n    status\n    type\n    count\n    interval\n    worker\n    createdAt\n  }\n}",
+										"variables": ""
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Data",
+					"item": [
+						{
+							"name": "UDP Destination",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"SYSLOG\",\n  \"destination\": \"udp:127.0.0.1:514\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "TCP Destination",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"SYSLOG\",\n  \"destination\": \"tcp:127.0.0.1:514\",\n  \"count\": 5,\n  \"interval\": 2\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "CEF",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $vendor: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, vendor: $vendor}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"CEF\",\n  \"destination\": \"udp:127.0.0.1:514\",\n  \"vendor\": \"XYZ\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "LEEF",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"LEEF\",\n  \"destination\": \"udp:127.0.0.1:514\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "With Count",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"SYSLOG\",\n  \"destination\": \"udp:127.0.0.1:514\",\n  \"count\": 2\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "With Interval",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $interval: Int!, $count: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"SYSLOG\",\n  \"destination\": \"udp:127.0.0.1:514\",\n  \"count\": 2,\n  \"interval\": 5\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "With TimeStamp",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $timestamp: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, timestamp: $timestamp}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"SYSLOG\",\n  \"destination\": \"udp:127.0.0.1:514\",\n  \"timestamp\":\"2022-01-01 12:00:00\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "With Observables",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $observablesDict: JSON!, $count: Int) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, observablesDict: $observablesDict,count: $count}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"SYSLOG\",\n  \"destination\": \"udp:192.168.1.73:514\",\n  \"observablesDict\":{\"src_host\":[\"host1\",\"host2\"]},\n  \"count\":5\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Webhook - Incident",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $vendor: String!,$fields: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, vendor: $vendor, fields: $fields}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"INCIDENT\",\n  \"destination\": \"https://xsoar.ayman.online/instance/execute/rosetta\",\n  \"count\": 2,\n  \"interval\": 2,\n  \"vendor\": \"XYZ\",\n  \"fields\": \"id,type,duration,analyst,severity,description,events\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Webhook - JSON",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"JSON\",\n  \"destination\": \"https://xsoar.ayman.online/instance/execute/rosetta\",\n  \"count\": 2,\n  \"interval\": 2\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "XSIAM-JSON",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $vendor: String!, $product: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, vendor: $vendor, product: $product}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"JSON\",\n  \"destination\": \"XSIAM\",\n  \"count\": 2,\n  \"interval\": 2,\n  \"vendor\": \"Xlog\",\n  \"product\": \"ABC\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "XSIAM-CEF",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $vendor: String!, $product: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, vendor: $vendor, product: $product}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}",
+										"variables": "{\n  \"type\": \"JSON\",\n  \"destination\": \"XSIAM\",\n  \"count\": 2,\n  \"interval\": 2,\n  \"vendor\": \"Xlog\",\n  \"product\": \"ABC\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Scenario",
+					"item": [
+						{
+							"name": "Scenario",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "graphql",
+									"graphql": {
+										"query": "query MyQuery($scenario: String!, $destination: String!) {\n    createScenarioWorker(requestInput: {scenario: $scenario, destination: $destination}) {\n        count\n        createdAt\n        destination\n        type\n        worker\n        status\n  }\n}",
+										"variables": "{\n  \"scenario\": \"dark_secrets\",\n  \"destination\": \"udp:192.168.70.165:5144\"\n}"
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000"
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Faker - Syslog",
+			"item": [
+				{
+					"name": "Fake Syslog",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!) {\n  generateFakeData(requestInput: {type: $type}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"SYSLOG\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Syslo - Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $requiredFields: String!) {\n  generateFakeData(requestInput: {type: $type, requiredFields:$requiredFields}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"SYSLOG\",\n    \"requiredFields\":\"remote_ip,remote_port,local_ip,local_port,severity,alert_name\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Syslog - TimeStamp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $timestamp: String!) {\n  generateFakeData(requestInput: {type: $type, timestamp: $timestamp}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"SYSLOG\",\n    \"timestamp\":\"2022-01-01 12:00:00\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Syslog - Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"SYSLOG\",\n    \"count\":3\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Syslog - Observables",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"SYSLOG\",\n    \"observablesDict\":{\"src_host\":[\"test12\",\"test32\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Faker - CEF",
+			"item": [
+				{
+					"name": "Fake CEF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!) {\n  generateFakeData(requestInput: {type: $type}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://192.168.70.131:8000",
+							"protocol": "http",
+							"host": [
+								"192",
+								"168",
+								"70",
+								"131"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $requiredFields: String!) {\n  generateFakeData(requestInput: {type: $type, requiredFields:$requiredFields}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"requiredFields\":\"remote_ip,remote_port,local_ip,local_port,severity,alert_name\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Vendor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $vendor: String!) {\n  generateFakeData(requestInput: {type: $type, vendor: $vendor}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"vendor\": \"XYZ\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Version",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $version: String!) {\n  generateFakeData(requestInput: {type: $type, version: $version}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"version\": \"5.0\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!, $observablesDict: JSON!) {\n  generateFakeData(requestInput: {type: $type, product: $product, observablesDict: $observablesDict}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"product\": \"generic\",\n    \"observablesDict\":{\"src_host\":[\"test12\",\"test32\"],\"remote_port\":[\"443\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - TimeStamp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $datetimeIso: String!) {\n  generateFakeData(requestInput: {type: $type, datetimeIso: $datetimeIso}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"datetimeIso\":\"2022-01-01 12:00:00\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"count\":3\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Firewall",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"product\": \"Firewall\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Email GW",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"product\": \"EmailGW\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake CEF - Observables",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"observablesDict\":{\"dst_host\":[\"test12\",\"test32\"],\"remote_port\":[\"443\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Faker - LEEF",
+			"item": [
+				{
+					"name": "Fake LEEF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!) {\n  generateFakeData(requestInput: {type: $type}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - WAF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"product\": \"WAF\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Generic",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"observablesDict\":{\"src_ip\":[\"1.1.1.1\",\"2.2.2.2\"],\"error_code\":[\"200\"], \n    \"techniques\":[{\"indicator\":\"https://www.example.org/auth\",\"mechanism\":\"POST\"}]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $requiredFields: String!) {\n  generateFakeData(requestInput: {type: $type, requiredFields:$requiredFields}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"requiredFields\":\"remote_ip,remote_port,local_ip,local_port,severity,alert_name\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - TimeStamp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $datetimeIso: String!) {\n  generateFakeData(requestInput: {type: $type, datetimeIso: $datetimeIso}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"datetimeIso\":\"2022-01-01 12:00:00\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"count\":3\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Observables",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"observablesDict\":{\"src_ip\":[\"1.1.1.1\",\"2.2.2.2\"],\"error_code\":[\"200\"], \n    \"technique\":[{\"indicator\":\"https://www.example.org/auth\",\"mechanism\":\"POST\"}]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Vendor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $vendor: String!) {\n  generateFakeData(requestInput: {type: $type, vendor: $vendor}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"vendor\": \"XYZ\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"product\": \"TestProduct\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake LEEF - Version",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $version: String!) {\n  generateFakeData(requestInput: {type: $type, version: $version}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"LEEF\",\n    \"version\": \"5.0\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Faker - WINEVENT",
+			"item": [
+				{
+					"name": "Fake WINEVENT",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!) {\n  generateFakeData(requestInput: {type: $type}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"WINEVENT\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake WINEVENT - TimeStamp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $datetimeIso: String!) {\n  generateFakeData(requestInput: {type: $type, datetimeIso: $datetimeIso}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"WINEVENT\",\n    \"datetimeIso\":\"2022-01-01 12:00:00\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake WINEVENT - Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"WINEVENT\",\n    \"count\":3\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake WINEVENT - Observables",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"WINEVENT\",\n    \"observablesDict\":{\"src_ip\":[\"1.1.1.1\",\"2.2.2.2\"],\"event_id\":[\"4683\",\"5648\"],\"process\":[\"explorer.exe\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Faker - JSON",
+			"item": [
+				{
+					"name": "Fake JSON",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!) {\n  generateFakeData(requestInput: {type: $type}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake JSON - Vendor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $vendor: String!) {\n  generateFakeData(requestInput: {type: $type, vendor: $vendor}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\",\n    \"vendor\": \"TestVendor\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake JSON - Required Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $requiredFields: String!) {\n  generateFakeData(requestInput: {type: $type, requiredFields:$requiredFields}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\",\n    \"requiredFields\":\"remote_ip,remote_port,local_ip,local_port,severity,alert_name\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake JSON - VulnScanner",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\",\n    \"product\": \"VulnScanner\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake JSON - TimeStamp",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $datetimeIso: String!) {\n  generateFakeData(requestInput: {type: $type, datetimeIso: $datetimeIso}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\",\n    \"datetimeIso\":\"2022-01-01 12:00:00\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake JSON - Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\",\n    \"count\":3\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake JSON - Observables",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict,  product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"JSON\",\n    \"product\": \"Productx\",\n    \"observablesDict\":{\"cmd\":[\"ping 1.1.1.1\",\"cat passwd\"],\"url\":[\"http://www.cnn.com\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Faker - Incident",
+			"item": [
+				{
+					"name": "Fake Incident",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!) {\n  generateFakeData(requestInput: {type: $type}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Incident - Select Fields",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $fields: String!) {\n  generateFakeData(requestInput: {type: $type, fields: $fields}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\",\n    \"fields\":\"id,type,duration,analyst,severity,description,events\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Incident - Count",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\",\n    \"count\":3\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Incident - Observables",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!, $fields: String!, $timestamp: String!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict, fields:$fields, timestamp: $timestamp}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\",\n    \"observablesDict\":{\"incident_types\":[\"phishing\",\"malware\"],\"src_host\":[\"host1\",\"host2\"]},\n    \"fields\": \"id,type,duration,analyst,severity,description,events\",\n    \"timestamp\":\"2022-01-01 12:00:00\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Incident - Vendor",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $vendor: String!, $fields: String!) {\n  generateFakeData(requestInput: {type: $type, vendor: $vendor, fields:$fields}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\",\n    \"vendor\": \"XYZ\",\n    \"fields\": \"id,type,duration,analyst,severity,description,events\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Incident - Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\",\n    \"product\": \"waf\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fake Incident - Version",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $version: String!) {\n  generateFakeData(requestInput: {type: $type, version: $version}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"Incident\",\n    \"version\": \"5.0\"\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Faker - XSIAM",
+			"item": [
+				{
+					"name": "Parsed",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict,  product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"XSIAM_Parsed\",\n    \"product\": \"Productx\",\n    \"observablesDict\":{\"alert_name\":[\"xlog_alert1\",\"xlog_alert2\"],\"remote_port\":[\"443\"],\"action_status\":[\"done\"],\"unix_cmd\":[\"cat /etc/passwd\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CEF",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query MyQuery ($type: FakerTypeEnum!, $observablesDict: JSON!, $product: String!) {\n  generateFakeData(requestInput: {type: $type, observablesDict: $observablesDict,  product: $product}) {\n    count\n    data\n    type\n  }\n}",
+								"variables": "{\n    \"type\": \"CEF\",\n    \"product\": \"Productx\",\n    \"observablesDict\":{\"alert_name\":[\"xlog_alert1\",\"xlog_alert2\"],\"remote_port\":[\"443\"],\"action_status\":[\"done\"],\"unix_cmd\":[\"cat /etc/passwd\"]}\n}"
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000"
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
