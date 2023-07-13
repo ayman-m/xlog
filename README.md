@@ -28,7 +28,7 @@ You can run XLog in several ways:
 - Run the image `docker run --name xlog -p 8000:8000 -d rosetta`
 
 ### Option (3) - Run a Ready Container
-- You can run a ready container: `docker run --name xlog -p 8000:8000 -d aymanam/xlog:latest`
+- You can run a ready container: `docker run --env-file .env -dp 8000:8000 -it aymanam/xlog:latest`
 ***
 ## Available Queries
 You can use the built-in GraphiQL in-browser tool `http://[xlog-address]:[port]` for writing, validating, and
