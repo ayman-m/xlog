@@ -13,9 +13,17 @@
 # XLog
 XLog is a tool to help you generate synthetic log messages. The main interface to the tool is a GraphQL API service with query capabilities to automate the following:
 - Fake log messages in different formats.
+- Group different logs in scenarios representing different attack techniques.
 - Run a worker to send those messages to your detection tools.
 ***
 ## Usage
+If you are planning to use Xlog with XSIAM, you need to create an XSIAM API Key and store the key id in an env file, example:
+```bash
+XSIAM_URL=https://api-xsiam-sandbox-emea.xdr.eu.paloaltonetworks.com
+XSIAM_ID=10
+XSIAM_KEY=AbCxYz
+```
+
 You can run XLog in several ways:
 
 ### Option (1) - Installation
@@ -36,39 +44,14 @@ testing your GraphQL queries. Type queries into this side of the screen, and you
 You can also click on the Explorer page to view a list of the available queries.
 
 With all the queries, you can pass a dict of observables if you want Xlog to use those observables in the synthetic log messages, you can include the following observables in your dict:
-- src_ip
-- dst_ip
-- src_host
-- dst_host
-- src_domain
-- dst_domain
-- sender_email
-- recipient_email
-- email_subject
-- email_body
-- url
-- port
-- protocol
-- inbound_bytes
-- outbound_bytes
-- app
-- os
-- user
-- cve
-- file_name
-- file_hash
-- cmd
-- process
-- technique
-- entry_type
-- severity
-- sensor
-- action
-- event_id
-- error_code
-- terms
-- incident_types
-- analysts
+
+```csv
+local_ip, remote_ip, local_ip_v6, remote_ip_v6, src_host, dst_host, src_domain, dst_domain, sender_email, 
+recipient_email, email_subject, email_body, url, source_port, remote_port, protocol, inbound_bytes, 
+outbound_bytes, app, os, user, cve, file_name, file_hash, win_cmd, unix_cmd, win_process, win_child_process,
+ unix_process, unix_child_process, technique, entry_type, severity, sensor, action, event_id, error_code, terms,
+  alert_types, alert_name, incident_types, analysts, action_status
+```
 
 ### Synthetic Log Generator
 `generateFakeData` query can be used to generate fake logs in different log formats.
@@ -417,7 +400,9 @@ Example output:
 ***
 
 ### Synthetic Log Sender
-`dataWorkerCreate` query can be used to create a new worker to send the faked logs to a destination detection tool.
+`createDataWorker` query can be used to create a new worker to send the faked logs to a destination detection tool.
+
+#### Create a UDP Worker 
 
 You can use the UDP worker for sending generic Syslog, CEF and LEEF Messages.
 
@@ -425,13 +410,13 @@ You can use the UDP worker for sending generic Syslog, CEF and LEEF Messages.
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":5,"interval":2}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629095100",
             "type": "SYSLOG",
             "status": "Running",
@@ -453,13 +438,13 @@ If you want to fake multiple log entries, you can set the count input to an int.
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":2}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":2}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629134154",
             "type": "SYSLOG",
             "status": "Running",
@@ -482,13 +467,13 @@ If you want to fake set the interval between sent log entries, you can set the i
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $interval: Int!, $count: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":2,"interval":5}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $interval: Int!, $count: Int!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","count":2,"interval":5}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629135734",
             "type": "SYSLOG",
             "status": "Running",
@@ -511,13 +496,13 @@ If you want to set a timestamp to start from, you can set the timestamp input to
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $timestamp: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, timestamp: $timestamp}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","timestamp":"2022-01-01 12:00:00"}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $timestamp: String!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, timestamp: $timestamp}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","timestamp":"2022-01-01 12:00:00"}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629140330",
             "type": "SYSLOG",
             "status": "Running",
@@ -534,38 +519,25 @@ PCAP:
 ***
 ***
 If you want to set an observables object, you can use the observablesDict input, below are all the types of observables that you can use in your dict, please review the supported observables for each log type:
-- incident_types
-- analysts
-- severity
-- terms
-- src_host
-- user
-- process
-- cmd
-- dst_ip
-- protocol
-- url
-- port
-- action
-- event_id
-- src_ip
-- file_hash
-- technique
-- error_code
-- file_name
-- cve
+```csv
+local_ip, remote_ip, local_ip_v6, remote_ip_v6, src_host, dst_host, src_domain, dst_domain, sender_email, 
+recipient_email, email_subject, email_body, url, source_port, remote_port, protocol, inbound_bytes, 
+outbound_bytes, app, os, user, cve, file_name, file_hash, win_cmd, unix_cmd, win_process, win_child_process,
+ unix_process, unix_child_process, technique, entry_type, severity, sensor, action, event_id, error_code, terms,
+  alert_types, alert_name, incident_types, analysts, action_status
+```
 ##### A curl example:
 
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $observablesDict: JSON!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, observablesDict: $observablesDict}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","observablesDict":{"src_host":["test12","test32"]}}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $observablesDict: JSON!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, observablesDict: $observablesDict}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"udp:127.0.0.1:514","observablesDict":{"src_host":["test12","test32"]}}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629141531",
             "type": "SYSLOG",
             "status": "Running",
@@ -581,7 +553,7 @@ PCAP:
 <img  align="left" src="img/worker-observables.png" width="100%" alt="Worker Observables">
 ***
 ***
-#### 1.2 - Create a TCP Worker 
+#### Create a TCP Worker 
 You can use the TCP worker for sending generic Syslog, CEF and LEEF Messages.
 ***
 You can use same query options that include count, interval, timestamp and observables; Please refer to the above examples.
@@ -590,13 +562,13 @@ You can use same query options that include count, interval, timestamp and obser
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"tcp:127.0.0.1:514","count":5,"interval":2}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        createdAt\n  }\n}","variables":{"type":"SYSLOG","destination":"tcp:127.0.0.1:514","count":5,"interval":2}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629140642",
             "type": "SYSLOG",
             "status": "Running",
@@ -609,7 +581,7 @@ Example output:
 }
 ```
 ***
-#### 1.2 - Create a Webhook Worker 
+#### Create a Webhook Worker 
 You can use the Webhook worker for sending JSON and Incident Messages.
 ***
 You can use same query options that include count, interval, timestamp, observables, fields and verify_ssl; Please refer to the above examples.
@@ -618,13 +590,13 @@ You can use same query options that include count, interval, timestamp, observab
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!,$fields: String!) {\n    dataWorkerCreate(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, fields: $fields}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}","variables":{"type":"JSON","destination":"https://webhook-service.local","count":3,"interval":2,"fields":"id,type,duration,analyst,severity,description,events"}}'
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!,$fields: String!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, fields: $fields}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}","variables":{"type":"JSON","destination":"https://webhook-service.local","count":3,"interval":2,"fields":"id,type,duration,analyst,severity,description,events"}}'
 ```
 Example output:
 ```json
 {
     "data": {
-        "dataWorkerCreate": {
+        "createDataWorker": {
             "worker": "worker_20230629144632",
             "type": "JSON",
             "status": "Running",
@@ -634,6 +606,151 @@ Example output:
             "verifySsl": "False",
             "createdAt": "2023-06-29 14:46:32.622369"
         }
+    }
+}
+```
+***
+
+#### Create an XSIAM Worker to Send Alerts
+You can use the XSIAM worker for sending JSON Alerts.
+
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $vendor: String!, $product: String!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, vendor: $vendor, product: $product}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}","variables":{"type":"JSON","destination":"XSIAM","count":2,"interval":2,"vendor":"Xlog","product":"ABC"}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "createDataWorker": {
+            "worker": "worker_20230717160020",
+            "type": "JSON",
+            "status": "Running",
+            "count": "0",
+            "interval": "1",
+            "destination": "https://api-xsiam-sandbox-emea.xdr.eu.paloaltonetworks.com/public_api/v1/alerts/insert_cef_alerts",
+            "verifySsl": "False",
+            "createdAt": "2023-07-17 16:00:22.424259"
+        }
+    }
+}
+```
+***
+You can use the XSIAM worker for sending CEF Alerts.
+
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($type: WorkerTypeEnum!, $destination: String!, $count: Int!, $interval: Int!, $vendor: String!, $product: String!) {\n    createDataWorker(requestInput: {type: $type, destination: $destination, count: $count, interval: $interval, vendor: $vendor, product: $product}) {\n        worker\n        type\n        status\n        count\n        interval\n        destination\n        verifySsl\n        createdAt\n  }\n}","variables":{"type":"CEF","destination":"XSIAM","count":2,"interval":2,"vendor":"Xlog","product":"ABC"}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "createDataWorker": {
+            "worker": "worker_20230717160156",
+            "type": "JSON",
+            "status": "Running",
+            "count": "0",
+            "interval": "1",
+            "destination": "https://api-xsiam-sandbox-emea.xdr.eu.paloaltonetworks.com/public_api/v1/alerts/insert_cef_alerts",
+            "verifySsl": "False",
+            "createdAt": "2023-07-17 16:01:58.823652"
+        }
+    }
+}
+```
+***
+### Synthetic Scenario Sender
+You can create and use Scenario log files to contain multiple log entries to represent different attack techniques.
+
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery($scenario: String!, $destination: String!) {\n    createScenarioWorker(requestInput: {scenario: $scenario, destination: $destination}) {\n        count\n        createdAt\n        destination\n        type\n        worker\n        status\n  }\n}","variables":{"scenario":"dark_secrets","destination":"udp:192.168.70.165:514"}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "createScenarioWorker": [
+            {
+                "count": "0",
+                "createdAt": "2023-07-17 15:11:01.586093",
+                "destination": "udp:192.168.70.165:514",
+                "type": "CEF",
+                "worker": "worker_20230717151101",
+                "status": "Running"
+            },
+            {
+                "count": "0",
+                "createdAt": "2023-07-17 15:11:01.587538",
+                "destination": "udp:192.168.70.165:514",
+                "type": "LEEF",
+                "worker": "worker_20230717151101",
+                "status": "Running"
+            },
+            {
+                "count": "0",
+                "createdAt": "2023-07-17 15:11:01.587847",
+                "destination": "udp:192.168.70.165:514",
+                "type": "LEEF",
+                "worker": "worker_20230717151101",
+                "status": "Running"
+            },
+            {
+                "count": "19",
+                "createdAt": "2023-07-17 15:11:01.588045",
+                "destination": "udp:192.168.70.165:514",
+                "type": "CEF",
+                "worker": "worker_20230717151101",
+                "status": "Running"
+            },
+            {
+                "count": "0",
+                "createdAt": "2023-07-17 15:11:01.588257",
+                "destination": "udp:192.168.70.165:514",
+                "type": "SYSLOG",
+                "worker": "worker_20230717151101",
+                "status": "Running"
+            }
+        ]
+    }
+}
+```
+***
+#### List Sender Workers
+You can query Xlog to list current workers.
+
+##### A curl example:
+
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery {\n  listWorkers {\n    destination\n    status\n    type\n    count\n    interval\n    worker\n    createdAt\n  }\n}","variables":{}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "listWorkers": [
+            {
+                "destination": "https://api-xsiam-sandbox-emea.xdr.eu.paloaltonetworks.com/public_api/v1/alerts/insert_cef_alerts",
+                "status": "Stopped",
+                "type": "JSON",
+                "count": "0",
+                "interval": "1",
+                "worker": "worker_20230717160156",
+                "createdAt": "2023-07-17 16:01:58.823652"
+            }
+        ]
     }
 }
 ```
