@@ -11,7 +11,7 @@ from rosetta import Events, Observables, Sender
 
 from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput
 from app.types.sender import WorkerActionEnum, DataWorkerCreateInput, DataWorkerActionInput, WorkerOutput, \
-    WorkerStatusOutput, ScenarioWorkerCreateInput
+    WorkerStatusOutput, ScenarioWorkerCreateInput, WorkerTypeEnum
 
 from app.helper import scenario_sender_data
 
@@ -151,7 +151,8 @@ class Query:
                 "x-xdr-auth-id": XSIAM_ID
             }
             xsiam_alerts = []
-            if request_input.type == "JSON":
+            if request_input.type == WorkerTypeEnum.JSON:
+
                 xsiam_destination = XSIAM_URL + "/public_api/v1/alerts/insert_parsed_alerts"
                 mandatory_fields = Config.XSIAM_MANDATORY_PARSED_FIELDS
                 optional_fields = Config.XSIAM_OPTIONAL_PARSED_FIELDS

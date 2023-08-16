@@ -16,6 +16,8 @@ XLog is a tool to help you generate synthetic log messages. The main interface t
 - Group different logs in scenarios representing different attack techniques.
 - Run a worker to send those messages to your detection tools.
 ***
+<img  align="left" src="img/logo.png" width="100%" alt="Xlog"> 
+
 ## Usage
 If you are planning to use Xlog with XSIAM, you need to create an XSIAM API Key and store the key id in an env file, example:
 ```bash
