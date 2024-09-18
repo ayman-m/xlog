@@ -34,3 +34,24 @@ class DataFakerOutput:
     data: List[JSON]
     type: str
     count: int
+
+@strawberry.input(description="Data observables dictionary.")
+class ObservablesInput:
+    sender_email: Optional[str] = None
+    recipient_email: Optional[str] = None
+    email_subject: Optional[str] = None
+    email_body: Optional[str] = None
+    file_name: Optional[str] = None
+    file_hash: Optional[str] = None
+    action: Optional[str] = None
+    host: Optional[List[str]] = None
+    local_ip: Optional[List[str]] = None
+    win_process: Optional[List[str]] = None
+    win_child_process: Optional[List[str]] = None
+    win_cmd: Optional[List[str]] = None
+    user: Optional[List[str]] = None
+    remote_ip: Optional[List[str]] = None
+    remote_port: Optional[List[str]] = None
+    unix_process: Optional[List[str]] = None
+    src_host: Optional[List[str]] = None
+    # Add any other observables as needed

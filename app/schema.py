@@ -12,6 +12,7 @@ from rosetta import Events, Observables, Sender
 from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput
 from app.types.sender import WorkerActionEnum, DataWorkerCreateInput, DataWorkerActionInput, WorkerOutput, \
     WorkerStatusOutput, ScenarioWorkerCreateInput, WorkerTypeEnum
+from app.types.scenarios import ScenarioInput
 
 from app.helper import scenario_sender_data
 
@@ -33,13 +34,10 @@ class Query:
     def generate_fake_data(self, request_input: DataFakerInput) -> DataFakerOutput:
         """
         Generate fake data based on the provided input.
-
         Args:
             request_input: Input object containing the type of fake data to generate and additional options.
-
         Returns:
             DataFakerOutput: Output object containing the generated fake data.
-
         """
         data = []
         vendor = request_input.vendor or "XLog"
@@ -316,5 +314,49 @@ class Query:
                                           status=workers[request_input.worker].status)
         return WorkerStatusOutput(worker=request_input.worker, status="Worker not found.")
 
+@strawberry.type(description="Root mutation type.")
+class Mutation:
+    @strawberry.mutation(description="Create a new scenario.")
+    def create_scenario(self, scenario_input: ScenarioInput) -> str:
+        """
+        Create a new scenario based on the provided input.
 
-schema = strawberry.Schema(query=Query)
+        Args:
+            scenario_input: Input object containing the scenario details.
+
+        Returns:
+            str: A message indicating the scenario was created successfully.
+        """
+        # Implement logic to save the scenario, e.g., to a database or file.
+        # For simplicity, let's save it as a JSON file.
+        scenario_data = {
+            'name': scenario_input.name,
+            'description': scenario_input.description,
+            'tactics': [tactic.__dict__ for tactic in scenario_input.tactics]
+        }
+        scenario_file = f'scenarios/ready/{scenario_input.name}.json'
+        with open(scenario_file, 'w') as file:
+            json.dump(scenario_data, file, indent=4)
+        return f"Scenario '{scenario_input.name}' created successfully."
+
+    @strawberry.mutation(description="Delete an existing scenario.")
+    def delete_scenario(self, name: str) -> str:
+        """
+        Delete a scenario by name.
+
+        Args:
+            name: The name of the scenario to delete.
+
+        Returns:
+            str: A message indicating the scenario was deleted successfully.
+        """
+        scenario_file = f'scenarios/ready/{name}.json'
+        if os.path.exists(scenario_file):
+            os.remove(scenario_file)
+            return f"Scenario '{name}' deleted successfully."
+        else:
+            return f"Scenario '{name}' does not exist."
+
+
+schema = strawberry.Schema(query=Query, mutation=Mutation)
+
