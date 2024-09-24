@@ -50,7 +50,7 @@ class Query:
         required_fields = request_input.required_fields
         if observables:
             observables_data = {}
-            for key, value in observables.items():
+            for key, value in observables.__dict__.items():
                 if value is not None and key in observables_init.__dict__:
                     observables_data[key] = value
             observables_obj = Observables(**observables_data)
@@ -358,5 +358,5 @@ class Mutation:
             return f"Scenario '{name}' does not exist."
 
 
-schema = strawberry.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(query=Query)
 
