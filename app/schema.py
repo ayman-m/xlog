@@ -47,7 +47,7 @@ class Query:
             datetime_obj = None
         observables_init = Observables()
         observables = request_input.observables_dict
-        required_fields = request_input.required_fields
+        required_fields = ",".join([field.value for field in request_input.required_fields])
         if observables:
             observables_data = {}
             for key, value in observables.__dict__.items():
