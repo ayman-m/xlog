@@ -58,21 +58,21 @@ class Query:
             observables_obj = None
         if request_input.type == FakerTypeEnum.SYSLOG:
             data = Events.syslog(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
-                                 required_fields=required_fields)
+                                required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.CEF:
             data = Events.cef(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
-                              vendor=vendor, product=request_input.product, version=request_input.version,
-                              required_fields=required_fields)
+                            vendor=vendor, product=request_input.product, version=request_input.version,
+                            required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.LEEF:
             data = Events.leef(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
-                               vendor=vendor, product=request_input.product, version=request_input.version,
-                               required_fields=required_fields)
+                            vendor=vendor, product=request_input.product, version=request_input.version,
+                            required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.WINEVENT:
             data = Events.winevent(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.JSON:
             data = Events.json(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
-                               vendor=vendor, product=request_input.product, version=request_input.version,
-                               required_fields=required_fields)
+                            vendor=vendor, product=request_input.product, version=request_input.version,
+                            required_fields=required_fields)
         elif request_input.type == FakerTypeEnum.Incident:
             data = Events.incidents(count=request_input.count, fields=request_input.fields, datetime_iso=datetime_obj,
                                     observables=observables_obj, vendor=vendor, product=request_input.product,
@@ -83,8 +83,8 @@ class Query:
             optional_fields = Config.XSIAM_OPTIONAL_PARSED_FIELDS
             total_fields = mandatory_fields+","+optional_fields+",vendor,product,event_timestamp"
             raw_data = Events.json(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
-                                   vendor=vendor, product=request_input.product, version=request_input.version,
-                                   required_fields=mandatory_fields)
+                                vendor=vendor, product=request_input.product, version=request_input.version,
+                                required_fields=mandatory_fields)
             for item in raw_data:
                 if "datetime_iso" in item:
                     timestamp = item.pop("datetime_iso")
@@ -156,8 +156,8 @@ class Query:
                 optional_fields = Config.XSIAM_OPTIONAL_PARSED_FIELDS
                 total_fields = mandatory_fields+","+optional_fields+",vendor,product,event_timestamp"
                 raw_data = Events.json(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
-                                       vendor=vendor, product=request_input.product, version=request_input.version,
-                                       required_fields=mandatory_fields)
+                                    vendor=vendor, product=request_input.product, version=request_input.version,
+                                    required_fields=mandatory_fields)
                 for item in raw_data:
                     if "datetime_iso" in item:
                         timestamp = item.pop("datetime_iso")
