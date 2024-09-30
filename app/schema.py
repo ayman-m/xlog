@@ -115,11 +115,17 @@ class Query:
         Returns:
             DetailedScenarioOutput: The output object containing the generated fake data.
         """
-        scenario_data = []
+        scenario_steps = []
 
         # Iterate over each step in the scenario
         for step in request_input.steps:
-            step_data = []
+            step_data = {}
+            step_data['tactic'] = step.tactic
+            step_data['tactic_id'] = step.tactic_id
+            step_data['technique'] = step.technique
+            step_data['technique_id'] = step.technique_id
+            step_data['type'] = step.type
+            step_data["logs"] = []
 
             # For each log in the step, generate fake data
             for log_input in step.logs:
@@ -182,17 +188,16 @@ class Query:
                         xsiam_alerts.append(new_item)
                     data = xsiam_alerts
 
-
                 # Append the generated fake data to the step data
-                step_data.extend(data)
-
+                step_data["logs"].append(data)
+            
             # Add step data to the scenario data
-            scenario_data.append(step_data)
+            scenario_steps.append(step_data)
 
         return DetailedScenarioOutput(
-            data=scenario_data,
             name=request_input.name,
-            tags=request_input.tags
+            tags=request_input.tags,
+            steps=scenario_steps
         )
 
     @strawberry.field(description="Create a data worker.")

@@ -179,6 +179,6 @@ class DetailedScenarioInput:
 
 @strawberry.type(description="Output object containing the generated fake data.")
 class DetailedScenarioOutput:
-    data: List[JSON]
+    steps: List[JSON]
     name: str
     tags: Optional[List[str]] = None
