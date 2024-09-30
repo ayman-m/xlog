@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 from app.config import Config
 from rosetta import Events, Observables, Sender
 
-from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput
+from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput, DetailedScenarioStep, DetailedScenarioInput, DetailedScenarioOutput
 from app.types.sender import WorkerActionEnum, DataWorkerCreateInput, DataWorkerActionInput, WorkerOutput, \
     WorkerStatusOutput, ScenarioWorkerCreateInput, WorkerTypeEnum
 from app.types.scenarios import ScenarioInput
@@ -102,6 +102,97 @@ class Query:
             data=data,
             type=request_input.type,
             count=request_input.count
+        )
+
+    @strawberry.field(description="Generate fake scenario data based on the provided input.")
+    def generate_scenario_fake_data(self, request_input: DetailedScenarioInput) -> DetailedScenarioOutput:
+        """
+        Generate fake data for a scenario with multiple steps and logs.
+        
+        Args:
+            request_input: The input object containing the scenario details and log steps.
+        
+        Returns:
+            DetailedScenarioOutput: The output object containing the generated fake data.
+        """
+        scenario_data = []
+
+        # Iterate over each step in the scenario
+        for step in request_input.steps:
+            step_data = []
+
+            # For each log in the step, generate fake data
+            for log_input in step.logs:
+                data = []
+                vendor = log_input.vendor or "XLog"
+                if log_input.datetime_iso:
+                    datetime_obj = datetime.datetime.strptime(log_input.datetime_iso, "%Y-%m-%d %H:%M:%S")
+                else:
+                    datetime_obj = None
+                observables_init = Observables()
+                observables = log_input.observables_dict
+                required_fields = ",".join([field.value for field in log_input.required_fields])
+                if observables:
+                    observables_data = {}
+                    for key, value in observables.__dict__.items():
+                        if value is not None and key in observables_init.__dict__:
+                            observables_data[key] = value
+                    observables_obj = Observables(**observables_data)
+                else:
+                    observables_obj = None
+                if log_input.type == FakerTypeEnum.SYSLOG:
+                    data = Events.syslog(count=log_input.count, datetime_iso=datetime_obj, observables=observables_obj,
+                                        required_fields=required_fields)
+                elif log_input.type == FakerTypeEnum.CEF:
+                    data = Events.cef(count=log_input.count, datetime_iso=datetime_obj, observables=observables_obj,
+                                    vendor=vendor, product=log_input.product, version=log_input.version,
+                                    required_fields=required_fields)
+                elif log_input.type == FakerTypeEnum.LEEF:
+                    data = Events.leef(count=log_input.count, datetime_iso=datetime_obj, observables=observables_obj,
+                                    vendor=vendor, product=log_input.product, version=log_input.version,
+                                    required_fields=required_fields)
+                elif log_input.type == FakerTypeEnum.WINEVENT:
+                    data = Events.winevent(count=log_input.count, datetime_iso=datetime_obj, observables=observables_obj)
+                elif log_input.type == FakerTypeEnum.JSON:
+                    data = Events.json(count=log_input.count, datetime_iso=datetime_obj, observables=observables_obj,
+                                    vendor=vendor, product=log_input.product, version=log_input.version,
+                                    required_fields=required_fields)
+                elif log_input.type == FakerTypeEnum.Incident:
+                    data = Events.incidents(count=log_input.count, fields=log_input.fields, datetime_iso=datetime_obj,
+                                            observables=observables_obj, vendor=vendor, product=log_input.product,
+                                            version=log_input.version, required_fields=required_fields)
+                elif log_input.type == FakerTypeEnum.XSIAM_Parsed:
+                    xsiam_alerts = []
+                    mandatory_fields = Config.XSIAM_MANDATORY_PARSED_FIELDS
+                    optional_fields = Config.XSIAM_OPTIONAL_PARSED_FIELDS
+                    total_fields = mandatory_fields+","+optional_fields+",vendor,product,event_timestamp"
+                    raw_data = Events.json(count=log_input.count, datetime_iso=datetime_obj, observables=observables_obj,
+                                        vendor=vendor, product=log_input.product, version=log_input.version,
+                                        required_fields=mandatory_fields)
+                    for item in raw_data:
+                        if "datetime_iso" in item:
+                            timestamp = item.pop("datetime_iso")
+                            datetime_obj = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
+                            event_timestamp = int(datetime_obj.timestamp() * 1000)
+                            item["event_timestamp"] = event_timestamp
+                        new_item = {}
+                        for key in item.keys():
+                            if key in total_fields.split(","):
+                                new_item[key] = item[key]
+                        xsiam_alerts.append(new_item)
+                    data = xsiam_alerts
+
+
+                # Append the generated fake data to the step data
+                step_data.extend(data)
+
+            # Add step data to the scenario data
+            scenario_data.append(step_data)
+
+        return DetailedScenarioOutput(
+            data=scenario_data,
+            name=request_input.name,
+            tags=request_input.tags
         )
 
     @strawberry.field(description="Create a data worker.")
@@ -313,49 +404,6 @@ class Query:
             return WorkerStatusOutput(worker=workers[request_input.worker].worker_name,
                                           status=workers[request_input.worker].status)
         return WorkerStatusOutput(worker=request_input.worker, status="Worker not found.")
-
-@strawberry.type(description="Root mutation type.")
-class Mutation:
-    @strawberry.mutation(description="Create a new scenario.")
-    def create_scenario(self, scenario_input: ScenarioInput) -> str:
-        """
-        Create a new scenario based on the provided input.
-
-        Args:
-            scenario_input: Input object containing the scenario details.
-
-        Returns:
-            str: A message indicating the scenario was created successfully.
-        """
-        # Implement logic to save the scenario, e.g., to a database or file.
-        # For simplicity, let's save it as a JSON file.
-        scenario_data = {
-            'name': scenario_input.name,
-            'description': scenario_input.description,
-            'tactics': [tactic.__dict__ for tactic in scenario_input.tactics]
-        }
-        scenario_file = f'scenarios/ready/{scenario_input.name}.json'
-        with open(scenario_file, 'w') as file:
-            json.dump(scenario_data, file, indent=4)
-        return f"Scenario '{scenario_input.name}' created successfully."
-
-    @strawberry.mutation(description="Delete an existing scenario.")
-    def delete_scenario(self, name: str) -> str:
-        """
-        Delete a scenario by name.
-
-        Args:
-            name: The name of the scenario to delete.
-
-        Returns:
-            str: A message indicating the scenario was deleted successfully.
-        """
-        scenario_file = f'scenarios/ready/{name}.json'
-        if os.path.exists(scenario_file):
-            os.remove(scenario_file)
-            return f"Scenario '{name}' deleted successfully."
-        else:
-            return f"Scenario '{name}' does not exist."
 
 
 schema = strawberry.Schema(query=Query)

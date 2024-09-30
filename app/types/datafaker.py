@@ -158,3 +158,27 @@ class DataFakerOutput:
     data: List[JSON]
     type: str
     count: int
+
+
+@strawberry.input(description="Scenario step object for generating fake scenario data.")
+class DetailedScenarioStep:
+    tactic: Optional[str] = None
+    tactic_id: Optional[str] = None
+    technique: Optional[str] = None
+    technique_id:Optional[str] = None
+    type: Optional[str] = None
+    logs: List[DataFakerInput]
+
+
+@strawberry.input(description="Scenario input object for generating fake scenario data.")
+class DetailedScenarioInput:
+    name: str
+    tags:  Optional[List[str]] = None
+    steps: List[DetailedScenarioStep]
+
+
+@strawberry.type(description="Output object containing the generated fake data.")
+class DetailedScenarioOutput:
+    data: List[JSON]
+    name: str
+    tags: Optional[List[str]] = None
