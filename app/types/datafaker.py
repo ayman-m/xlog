@@ -166,6 +166,7 @@ class DetailedScenarioStep:
     tactic_id: Optional[str] = None
     technique: Optional[str] = None
     technique_id:Optional[str] = None
+    procedure:Optional[str] = None
     type: Optional[str] = None
     logs: List[DataFakerInput]
 

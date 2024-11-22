@@ -1,4 +1,5 @@
 import datetime
+import logging
 import strawberry
 import os
 import json
@@ -24,6 +25,9 @@ XSIAM_URL = os.environ.get("XSIAM_URL")
 XSIAM_ID = os.environ.get("XSIAM_ID")
 XSIAM_KEY = os.environ.get("XSIAM_KEY")
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 workers = {}
 
@@ -98,6 +102,10 @@ class Query:
                 xsiam_alerts.append(new_item)
             data = xsiam_alerts
 
+        # Log each entry generated
+        for entry in data:
+            logger.info("Generated log entry: %s", entry)
+
         return DataFakerOutput(
             data=data,
             type=request_input.type,
@@ -124,6 +132,7 @@ class Query:
             step_data['tactic_id'] = step.tactic_id
             step_data['technique'] = step.technique
             step_data['technique_id'] = step.technique_id
+            step_data['procedure'] = step.procedure
             step_data['type'] = step.type
             step_data["logs"] = []
 
@@ -187,6 +196,10 @@ class Query:
                                 new_item[key] = item[key]
                         xsiam_alerts.append(new_item)
                     data = xsiam_alerts
+
+                # Log each entry generated in scenario step
+                for entry in data:
+                    logger.info("Generated log entry for %s: %s", log_input.product, entry)
 
                 # Append the generated fake data to the step data
                 step_data["logs"].append(data)
