@@ -12,7 +12,7 @@ from rosetta import Events, Observables, Sender
 
 from app.types.datafaker import FakerTypeEnum, DataFakerInput, DataFakerOutput, DetailedScenarioStep, DetailedScenarioInput, DetailedScenarioOutput
 from app.types.sender import WorkerActionEnum, DataWorkerCreateInput, DataWorkerActionInput, WorkerOutput, \
-    WorkerStatusOutput, ScenarioWorkerCreateInput, WorkerTypeEnum
+    WorkerStatusOutput, ScenarioWorkerCreateInput, WorkerTypeEnum, ScenarioQueryWorkerCreateInput
 from app.types.scenarios import ScenarioInput
 
 from app.helper import scenario_sender_data
@@ -313,7 +313,7 @@ class Query:
                             destination=data_worker.destination, verifySsl=str(data_worker.verify_ssl),
                             createdAt=str(data_worker.created_at))
 
-    @strawberry.field(description="Create a scenario worker.")
+    @strawberry.field(description="Create a scenario worker from file.")
     def create_scenario_worker(self, request_input: ScenarioWorkerCreateInput) -> List[WorkerOutput]:
         """
         Create a scenario worker for sending fake data.
@@ -382,6 +382,148 @@ class Query:
                                                             createdAt=str(scenario_worker.created_at)))
         return scenario_workers_output
 
+    @strawberry.field(description="Create a scenario worker from query.")
+    def create_scenario_worker_from_query(self, request_input: ScenarioQueryWorkerCreateInput) -> List[WorkerOutput]:
+        """
+        Create scenario workers for sending fake data based on scenario steps provided in the request input.
+
+        Args:
+            request_input: Input object containing the options for creating data workers, including scenario steps.
+
+        Returns:
+            List[WorkerOutput]: Output list containing information about the created data workers.
+        """
+
+        global workers
+        scenario_workers_output = []
+        active_workers = {}
+
+        # Clean up inactive workers
+        for worker_id, worker in workers.items():
+            if worker.status == 'Running':
+                active_workers[worker_id] = worker
+        workers = active_workers
+
+        # Check if maximum number of workers is reached
+        if len(workers.keys()) >= int(Config.WORKERS_NUMBER):
+            raise Exception("All workers are busy, please stop a running worker.")
+
+        # Get scenario steps from request_input
+        scenario_steps = request_input.steps
+
+        if scenario_steps:
+            for step in scenario_steps:
+                # Each step may have multiple logs
+                for log_input in step.logs:
+                    now = datetime.datetime.now()
+                    worker_name = f"worker_{now.strftime('%Y%m%d%H%M%S')}"
+
+                    interval = log_input.interval or 1
+                    count = log_input.count or 1
+
+                    # Parse datetime if provided
+                    if log_input.datetime_iso:
+                        datetime_obj = datetime.datetime.strptime(log_input.datetime_iso, "%Y-%m-%d %H:%M:%S")
+                    else:
+                        datetime_obj = None
+
+                    # Obtain vendor from log_input
+                    vendor = log_input.vendor or "XLog"
+
+                    # Initialize observables
+                    observables_init = Observables()
+                    observables = log_input.observables_dict
+                    if observables:
+                        observables_data = {}
+                        for key, value in observables.__dict__.items():
+                            if value is not None and key in observables_init.__dict__:
+                                observables_data[key] = value
+                        observables_obj = Observables(**observables_data)
+                    else:
+                        observables_obj = None
+
+                    # Prepare required fields
+                    required_fields = ",".join([field.value for field in log_input.required_fields])
+
+                    # Create a worker for this log input
+                    scenario_worker = Sender(
+                        worker_name=worker_name,
+                        data_type=log_input.type,
+                        count=count,
+                        destination=request_input.destination,
+                        vendor=vendor,
+                        product=log_input.product,
+                        version=log_input.version,
+                        observables=observables_obj,
+                        interval=interval,
+                        datetime_obj=datetime_obj,
+                        required_fields=required_fields,
+                        fields=log_input.fields
+                    )
+
+                    # Store and start the worker
+                    workers[worker_name] = scenario_worker
+                    scenario_worker.start()
+
+                    # Collect output information
+                    scenario_workers_output.append(
+                        WorkerOutput(
+                            type=scenario_worker.data_type,
+                            worker=scenario_worker.worker_name,
+                            status=scenario_worker.status,
+                            count=scenario_worker.count,
+                            interval=scenario_worker.interval,
+                            destination=scenario_worker.destination,
+                            verifySsl=str(scenario_worker.verify_ssl),
+                            createdAt=str(scenario_worker.created_at)
+                        )
+                    )
+        else:
+            raise ValueError("No scenario steps provided in the request input.")
+
+        return scenario_workers_output
+
+        @strawberry.field(description="Get a list of data workers.")
+        def list_workers(self) -> List[WorkerOutput]:
+            """
+            Get a list of active data workers.
+
+            Returns:
+                List[DataWorkerOutput]: List of data worker objects containing information about each worker.
+
+            """
+            workers_data = []
+            for worker in workers.keys():
+                workers_data.append(WorkerOutput(type=workers[worker].data_type, worker=workers[worker].worker_name,
+                                                status=workers[worker].status, count=workers[worker].count,
+                                                interval=workers[worker].interval,
+                                                verifySsl=workers[worker].verify_ssl,
+                                                destination=workers[worker].destination,
+                                                createdAt=str(workers[worker].created_at)))
+            return workers_data
+
+        @strawberry.field(description="Perform an action on a data worker.")
+        def action_worker(self, request_input: DataWorkerActionInput) -> WorkerStatusOutput:
+            """
+            Perform an action on a data worker, such as stopping it.
+
+            Args:
+                request_input: Input object containing the worker ID and the action to perform.
+
+            Returns:
+                WorkerStatusOutput: Output object containing the worker ID and the status after the action.
+
+            """
+            if workers.get(request_input.worker):
+                if request_input.action == WorkerActionEnum.Stop:
+                    workers[request_input.worker].stop()
+                    workers.pop(request_input.worker)
+                    return WorkerStatusOutput(worker=request_input.worker,
+                                                status='Stopped')
+                return WorkerStatusOutput(worker=workers[request_input.worker].worker_name,
+                                            status=workers[request_input.worker].status)
+            return WorkerStatusOutput(worker=request_input.worker, status="Worker not found.")
+
     @strawberry.field(description="Get a list of data workers.")
     def list_workers(self) -> List[WorkerOutput]:
         """
@@ -422,7 +564,6 @@ class Query:
             return WorkerStatusOutput(worker=workers[request_input.worker].worker_name,
                                           status=workers[request_input.worker].status)
         return WorkerStatusOutput(worker=request_input.worker, status="Worker not found.")
-
 
 schema = strawberry.Schema(query=Query)
 
