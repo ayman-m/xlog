@@ -103,8 +103,7 @@ class Query:
             data = xsiam_alerts
 
         # Log each entry generated
-        for entry in data:
-            logger.info("Generated log entry: %s", entry)
+        logger.info(f"Generated {len(data)} {request_input.type} log entries.")
 
         return DataFakerOutput(
             data=data,
@@ -197,9 +196,7 @@ class Query:
                         xsiam_alerts.append(new_item)
                     data = xsiam_alerts
 
-                # Log each entry generated in scenario step
-                for entry in data:
-                    logger.info("Generated log entry for %s: %s", log_input.product, entry)
+                logger.info(f"Generated {len(data)} {log_input.type} log entries of scenario: {request_input.name}.")
 
                 # Append the generated fake data to the step data
                 step_data["logs"].append(data)
@@ -556,7 +553,7 @@ class Query:
 
         """
         if workers.get(request_input.worker):
-            if request_input.action == WorkerActionEnum.Stop:
+            if request_input.action == WorkerActionEnum.STOP:
                 workers[request_input.worker].stop()
                 workers.pop(request_input.worker)
                 return WorkerStatusOutput(worker=request_input.worker,
