@@ -441,7 +441,8 @@ class Query:
 
                     # Prepare required fields
                     required_fields = ",".join([field.value for field in log_input.required_fields])
-
+                    print(worker_name,log_input.type,count,request_input.destination,vendor,log_input.product,log_input.version,observables_obj,
+                        interval,datetime_obj,required_fields,log_input.fields)
                     # Create a worker for this log input
                     scenario_worker = Sender(
                         worker_name=worker_name,
