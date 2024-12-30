@@ -1,5 +1,5 @@
-# Use an official Python runtime as the base image
-FROM python:3.8-slim
+# Base Stage: Install Dependencies
+FROM python:3.8-slim AS base
 
 # Set the working directory in the container
 WORKDIR /
@@ -13,5 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the bot script into the container
 COPY . .
 
-# Run the bot script when the container launches
+# Local Run Stage: Add CMD for Local Execution
+FROM base AS local
 CMD ["python", "main.py"]
+
+# No CMD Stage
+FROM base AS available
