@@ -73,14 +73,14 @@ Example output:
         "generateFakeData": {
             "count": 1,
             "data": [
-                "Jun 27 09:18:52 web-23.stokes.com sudo[7907]: scottchristopher : COMMAND ; chmod -R 777 /"
+                "Jan 05 18:29:25 41538 perform evansrandy sudo find / -name '*.log' -exec rm -f {} \\;"
             ],
             "type": "FakerTypeEnum.SYSLOG"
         }
     }
 }
 ```
-You can use the type to CEF, LEEF, JSON, WINEVENT or Incident, examples of each type:
+You can use specific type of logs to be generated , the following types are currenlty supported: CEF, LEEF, JSON, WINEVENT and Incident , examples of responses for each type , using the above the CURL Query with just changing the "type" variable:
 
 - **CEF**
 ```json
@@ -89,7 +89,7 @@ You can use the type to CEF, LEEF, JSON, WINEVENT or Incident, examples of each 
         "generateFakeData": {
             "count": 1,
             "data": [
-                "CEF:0|XLog|None|1.0.8|2407d200-1da2-47bb-957d-5353d8d13a55|2023-07-01 07:54:27.392900|4|src_ip=84.196.134.193 src_port=47512 dst_ip=['110.179.127.163'] dst_port=64901 proto=TCP rule=8 act=Deny"
+                "CEF:0|XLog|chance|1.0.9|3f2eda60-d8b7-4ad5-b1b2-ea582d262903|2025-01-05T17:55:35.155577Z|low|local_ip=184.170.19.42 local_port=18380 remote_ip=118.33.231.7 remote_port=4717 protocol=RTP rule_id=75 action=Log"
             ],
             "type": "FakerTypeEnum.CEF"
         }
@@ -110,20 +110,6 @@ You can use the type to CEF, LEEF, JSON, WINEVENT or Incident, examples of each 
     }
 }
 ```
-- **WINEVENT**
-```json
-{
-    "data": {
-        "generateFakeData": {
-            "count": 1,
-            "data": [
-                "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><System><Provider Name=\"Microsoft-Windows-Security-Auditing\" Guid=\"88e230d4-38a6-4820-a5c6-ae3f5cab397e\"/><EventID>4624</EventID><Version>0</Version><Level>0</Level><Task>12544</Task><Opcode>0</Opcode><Keywords>0x8020000000000000</Keywords><TimeCreated SystemTime=\"2023-07-01 08:01:28.515343\"/><EventRecordID>863</EventRecordID><Correlation/><Execution ProcessID=\"8458\" ThreadID=\"2091\" Channel=\"Security\"/><Computer>db-20.reynolds-carr.net</Computer><Security UserID=\"S-1-4043\"/><EventData><Data Name=\"SubjectUserSid\">S-1-4043</Data><Data Name=\"SubjectUserName\">martin06</Data><Data Name=\"SubjectDomainName\">decker.com</Data><Data Name=\"SubjectLogonId\">S-1-4043</Data><Data Name=\"LogonType\">3</Data><Data Name=\"TargetUserSid\">S-1-4043</Data><Data Name=\"TargetUserName\">martin06</Data><Data Name=\"TargetDomainName\">decker.com</Data><Data Name=\"ProcessName\">services.exe</Data><Data Name=\"ProcessId\">8458</Data><Data Name=\"DestinationLogonId\">1655</Data><Data Name=\"SourceNetworkAddress\">172.31.76.116</Data><Data Name=\"SourcePort\">13019</Data><Data Name=\"LogonGuid\">88e230d4-38a6-4820-a5c6-ae3f5cab397e</Data><Data Name=\"TransmittedServices\">Soldier national available.</Data></EventData></Event>"
-            ],
-            "type": "FakerTypeEnum.WINEVENT"
-        }
-    }
-}
-```
 - **JSON**
 ```json
 {
@@ -133,15 +119,29 @@ You can use the type to CEF, LEEF, JSON, WINEVENT or Incident, examples of each 
             "data": [
                 {
                     "vendor": "XLog",
-                    "product": null,
-                    "version": "1.0.2",
-                    "timestamp": "2023-07-01 07:57:25",
-                    "severity": 3,
-                    "host": "lt-92.murphy.info",
-                    "user": "michellesolis"
+                    "product": "UnknownProduct",
+                    "version": "1.0.9",
+                    "datetime_iso": "2025-01-05 17:55:58",
+                    "severity": "Critical",
+                    "user": "castillotimothy",
+                    "host": "discover"
                 }
             ],
             "type": "FakerTypeEnum.JSON"
+        }
+    }
+}
+```
+- **WINEVENT**
+```json
+{
+    "data": {
+        "generateFakeData": {
+            "count": 1,
+            "data": [
+                "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><System><Provider Name=\"Microsoft-Windows-Security-Auditing\" Guid=\"e1f724ed-3b5e-42a1-a0fc-88b0248c670a\"/><EventID>4688</EventID><Version>0</Version><Level>0</Level><Task>13312</Task><Opcode>0</Opcode><Keywords>0x8020000000000000</Keywords><TimeCreated SystemTime=\"2025-01-06 11:30:03\"/><EventRecordID>53824087</EventRecordID><Correlation/><Execution ProcessID=\"7483\" ThreadID=\"1524\" Channel=\"Security\"/><Computer>email-30.clark-donaldson.com</Computer><Security UserID=\"bsmith\"/><EventData><Data Name=\"SubjectUserSid\">bsmith</Data><Data Name=\"SubjectUserName\">bsmith</Data><Data Name=\"SubjectDomainName\">klein-anthony.com</Data><Data Name=\"SubjectLogonId\">bsmith</Data><Data Name=\"NewProcessId\">5803</Data><Data Name=\"CreatorProcessId\">7483</Data><Data Name=\"TokenElevationType\">TokenElevationTypeLimited (3)</Data><Data Name=\"ProcessCommandLine\">Import-Module DSInternals; Get-SamDomainInformation</Data>"
+            ],
+            "type": "FakerTypeEnum.WINEVENT"
         }
     }
 }
@@ -155,9 +155,36 @@ You can use the type to CEF, LEEF, JSON, WINEVENT or Incident, examples of each 
             "data": [
                 {
                     "id": 1,
-                    "type": "Account Compromised",
                     "duration": 3,
-                    "analyst": "Mark"
+                    "type": "Malware",
+                    "analyst": "Christy",
+                    "severity": 4,
+                    "description": "Thought scientist institution prepare particular movement tax professional determine.",
+                    "events": [
+                        {
+                            "event": "Jan 06 10:59:33 8636 quickly markmcfarland sudo dd if=/dev/zero of=/dev/sda"
+                        },
+                        {
+                            "event": "CEF:0|XLog|edge|1.0.0|7b7d2cb4-481d-412e-8049-d6b7105a62a2|2025-01-06T10:59:32.720148Z|low|local_ip=104.37.149.239 local_port=23250 remote_ip=184.105.247.244 remote_port=53113 protocol=RTP rule_id=134 action=Wait"
+                        },
+                        {
+                            "event": "LEEF:1.0|XLog|discuss|1.0.7|959894936|severity=Low  devTime=Jan 06 10:59:32  local_ip=47.118.44.83  local_port=31123  host=page  url=https://example.com/user/profile.php?id=1234' OR 1=1 --&password=pass  protocol=SQL  response_code=200  action=Drop"
+                        },
+                        {
+                            "event": "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><System><Provider Name=\"Microsoft-Windows-Security-Auditing\" Guid=\"ba4c6e7a-da4c-468d-9018-d8d3f7622ede\"/><EventID>4624</EventID><Version>0</Version><Level>0</Level><Task>12544</Task><Opcode>0</Opcode><Keywords>0x8020000000000000</Keywords><TimeCreated SystemTime=\"2025-01-06 10:59:33\"/><EventRecordID>74630238</EventRecordID><Correlation/><Execution ProcessID=\"973\" ThreadID=\"6819\" Channel=\"Security\"/><Computer>laptop-08.hanson.org</Computer><Security UserID=\"kimberly70\"/><EventData><Data Name=\"SubjectUserSid\">kimberly70</Data><Data Name=\"SubjectUserName\">kimberly70</Data><Data Name=\"SubjectDomainName\">logan.com</Data><Data Name=\"SubjectLogonId\">kimberly70</Data><Data Name=\"LogonType\">3</Data><Data Name=\"TargetUserSid\">kimberly70</Data><Data Name=\"TargetUserName\">kimberly70</Data><Data Name=\"TargetDomainName\">logan.com</Data><Data Name=\"ProcessName\">spoolsv.exe</Data><Data Name=\"ProcessId\">973</Data><Data Name=\"DestinationLogonId\">5609</Data><Data Name=\"SourceNetworkAddress\">172.16.15.13</Data><Data Name=\"SourcePort\">16409</Data><Data Name=\"LogonGuid\">ba4c6e7a-da4c-468d-9018-d8d3f7622ede</Data><Data Name=\"TransmittedServices\">Half these attention big particular order.</Data></EventData></Event>"
+                        },
+                        {
+                            "event": {
+                                "vendor": "XLog",
+                                "product": "UnknownProduct",
+                                "version": "1.0.0",
+                                "datetime_iso": "2025-01-06 10:59:32",
+                                "severity": "Low",
+                                "user": "janice21",
+                                "host": "way"
+                            }
+                        }
+                    ]
                 }
             ],
             "type": "FakerTypeEnum.Incident"
@@ -165,9 +192,9 @@ You can use the type to CEF, LEEF, JSON, WINEVENT or Incident, examples of each 
     }
 }
 ```
-#### Using _Vendor_ Input
+#### Using _vendor_ Input
 ***
-You can use the vendor input with CEF, LEEF, JSON and Incident.
+You can use the "vendor" input with CEF, LEEF and JSON types of logs.
 
 **A curl example:**
 
@@ -185,12 +212,12 @@ Example output:
             "data": [
                 {
                     "vendor": "TestVendor",
-                    "product": null,
-                    "version": "1.0.3",
-                    "timestamp": "2023-07-01 08:11:08",
-                    "severity": 4,
-                    "host": "lt-45.brown.com",
-                    "user": "johnsonsusan"
+                    "product": "UnknownProduct",
+                    "version": "1.0.4",
+                    "datetime_iso": "2025-01-05 17:57:00",
+                    "severity": "Low",
+                    "user": "renee84",
+                    "host": "seat"
                 }
             ],
             "type": "FakerTypeEnum.JSON"
@@ -198,9 +225,9 @@ Example output:
     }
 }
 ```
-#### Using _Product_ Input
+#### Using _product_ Input
 ***
-You can use the Product input with CEF, LEEF, JSON and Incident.
+You can use the "product" input with CEF, LEEF and JSON.
 
 **A curl example:**
 
@@ -216,16 +243,16 @@ Example output:
         "generateFakeData": {
             "count": 1,
             "data": [
-                "LEEF:1.0|XLog|TestProduct|1.0.0|deviceEventDate=2023-07-01 08:54:32.034841|209.4.252.251|web-63.ryan.com|src_ip=197.193.74.111 src_port=15358 request_url=https://example.com/user/profile.php?id=1234' OR 1=1 --&password=pass protocol=TCP status=200 action=Log severity=5"
+                "LEEF:1.0|XLog|TestProduct|1.0.5|1020050003|severity=High  devTime=Jan 05 17:58:03  local_ip=115.124.80.129  local_port=36969  host=model  url=http://example.com/login.php  protocol=TCP  response_code=200  action=Allow"
             ],
             "type": "FakerTypeEnum.LEEF"
         }
     }
 }
 ```
-#### Using _Version_ Input
+#### Using _version_ Input
 ***
-You can use the Version input with CEF, LEEF, JSON and Incident.
+You can use the "version" input with CEF, LEEF, JSON and Incident.
 
 **A curl example:**
 
@@ -241,23 +268,23 @@ Example output:
         "generateFakeData": {
             "count": 1,
             "data": [
-                "LEEF:1.0|XLog|None|5.0|deviceEventDate=2023-07-01 08:55:06.086069|102.95.16.18|web-54.pruitt.net|src_ip=8.41.164.245 src_port=3131 request_url=https://example.com/search.php?q=<script>alert('xss')</script> protocol=HTTP status=403 action=Drop severity=4"
+                "LEEF:1.0|XLog|decade|5.0|127089161|severity=High  devTime=Jan 05 17:59:36  local_ip=221.218.25.129  local_port=9480  host=Republican  url=https://example.com/login.php?username=admin&password=pass  protocol=RDP  response_code=200  action=Allow"
             ],
             "type": "FakerTypeEnum.LEEF"
         }
     }
 }
 ```
-#### Using _Timestamp_ Input
+#### Using _timestamp_ Input
 ***
-If you want to set a timestamp to start from, you can set the timestamp input to a datatime formatted string, example "2022-01-01 12:00:00". You can use the timestamp input with Syslog, CEF, LEEF, WINEVENT, JSON and Incident.
+If you want to set a "timestamp" to start from, you can set the timestamp input to a datatime formatted string, example "2022-01-01 12:00:00". You can use the timestamp input with Syslog, CEF, LEEF, and JSON.
 
 **A curl example:**
 
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery ($type: FakerTypeEnum!, $timestamp: String!) {\n  generateFakeData(requestInput: {type: $type, timestamp: $timestamp}) {\n    count\n    data\n    type\n  }\n}","variables":{"type":"CEF","timestamp":"2022-01-01 12:00:00"}}'
+--data '{"query":"query MyQuery ($type: FakerTypeEnum!, $timestamp: String!) {\n  generateFakeData(requestInput: {type: $type, datetimeIso: $timestamp}) {\n    count\n    data\n    type\n  }\n}","variables":{"type":"CEF","timestamp":"2022-01-01 12:00:00"}}'
 ```
 Example output:
 ```json
@@ -266,21 +293,21 @@ Example output:
         "generateFakeData": {
             "count": 1,
             "data": [
-                "CEF:0|XLog|None|1.0.6|a01afc79-31c9-44d9-8143-9e2ee4d24b62|2022-01-01 12:00:01|3|src_ip=2.149.95.67 src_port=53236 dst_ip=['101.3.143.177'] dst_port=44855 proto=SSL rule=98 act=Deny"
+                "CEF:0|XLog|blue|1.0.4|6b91e46d-20a1-41a5-afd5-d0446ea4fb68|2022-01-01T12:00:00.000000Z|low|local_ip=146.61.255.44 local_port=50324 remote_ip=35.192.149.89 remote_port=50251 protocol=RTP rule_id=60 action=Log"
             ],
             "type": "FakerTypeEnum.CEF"
         }
     }
 }
 ```
-#### Using _Count_ Input
+#### Using _count_ Input
 ***
-If you want to fake multiple log entries, you can set the count input to an int. You can use the count input with Syslog, CEF, LEEF, WINEVENT, JSON and Incident.
+If you want to fake multiple log entries, you can set the count input to an int. You can use the count input with Syslog, CEF, LEEF, and JSON.
 ** A curl example:**
 ```bash
 curl --location 'http://localhost:8000' \
 --header 'Content-Type: application/json' \
---data '{"query":"query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}","variables":{"type":"WINEVENT","count":3}}'
+--data '{"query":"query MyQuery ($type: FakerTypeEnum!, $count: Int!) {\n  generateFakeData(requestInput: {type: $type, count: $count}) {\n    count\n    data\n    type\n  }\n}","variables":{"type":"CEF","count":3}}'
 ```
 Example output:
 ```json
@@ -289,26 +316,159 @@ Example output:
         "generateFakeData": {
             "count": 3,
             "data": [
-                "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><System><Provider Name=\"Microsoft-Windows-Security-Auditing\" Guid=\"368e76d6-e74a-4343-8f60-b97ec4cd83d5\"/><EventID>4648</EventID><Version>0</Version><Level>0</Level><Task>13824</Task><Opcode>0</Opcode><Keywords>0x8020000000000000</Keywords><TimeCreated SystemTime=\"2023-07-01 09:20:18.312391\"/><EventRecordID>144</EventRecordID><Correlation/><Execution ProcessID=\"4132\" ThreadID=\"6421\" Channel=\"Security\"/><Computer>web-17.carter.com</Computer><Security UserID=\"S-1-6214\"/><EventData><Data Name=\"SubjectUserSid\">S-1-6214</Data><Data Name=\"SubjectUserName\">robersontim</Data><Data Name=\"SubjectDomainName\">mejia-gomez.biz</Data><Data Name=\"SubjectLogonId\">S-1-6214</Data><Data Name=\"NewProcessId\">8893</Data><Data Name=\"ProcessId\">4132</Data><Data Name=\"CommandLine\">wmic.exe /namespace:\\root\\cimv2 path Win32_Account</Data><Data Name=\"TargetUserSid\">S-1-6214</Data><Data Name=\"TargetUserName\">robersontim</Data><Data Name=\"TargetDomainName\">mejia-gomez.biz</Data><Data Name=\"TargetLogonId\">S-1-6214</Data><Data Name=\"LogonType\">3</Data></EventData></Event>",
-                "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><System><Provider Name=\"Microsoft-Windows-Sysmon\" Guid=\"d888ca8b-3750-4bd2-876b-4c5ae4b87448\"/><EventID>10</EventID><Version>5</Version><Level>4</Level><Task>10</Task><Opcode>0</Opcode><Keywords>0x8000000000000000</Keywords><TimeCreated SystemTime=\"2023-07-01 09:20:19.312391\"/><EventRecordID>138</EventRecordID><Correlation/><Execution ProcessID=\"5705\" ThreadID=\"2024\" Channel=\"Microsoft-Windows-Sysmon/Operational\"/><EventData><Data Name=\"TargetImage\">C:\\Windows\\System32\\calc.exe</Data><Data Name=\"TargetPID\">5836</Data></EventData></Event>",
-                "<Event xmlns=\"http://schemas.microsoft.com/win/2004/08/events/event\"><System><Provider Name=\"Microsoft-Windows-Security-Auditing\" Guid=\"237c3186-d40d-4595-99d4-09d15063c5f0\"/><EventID>4672</EventID><Version>0</Version><Level>0</Level><Task>12544</Task><Opcode>0</Opcode><Keywords>0x8020000000000000</Keywords><TimeCreated SystemTime=\"2023-07-01 09:20:20.312391\"/><EventRecordID>868</EventRecordID><Correlation/><Execution ProcessID=\"6909\" ThreadID=\"2523\" Channel=\"Security\"/><Computer>db-42.rodriguez-jordan.biz</Computer><Security UserID=\"S-1-8484\"/><EventData><Data Name=\"SubjectUserSid\">S-1-8484</Data><Data Name=\"SubjectUserName\">smithethan</Data><Data Name=\"SubjectDomainName\">grant.com</Data><Data Name=\"SubjectLogonId\">7450</Data><Data Name=\"PrivilegeList\">From glass alone.</Data></EventData></Event>"
+                "CEF:0|XLog|leader|1.0.2|a3fd0c40-09f6-4480-9039-2b509ad50d13|2025-01-05T18:00:57.482255Z|low|local_ip=183.92.252.208 local_port=64886 remote_ip=47.93.115.100 remote_port=34985 protocol=SQL rule_id=176 action=Drop",
+                "CEF:0|XLog|leader|1.0.2|fbbb4f9b-cbf3-4258-99ac-521405f141f5|2025-01-05T18:00:58.482255Z|low|local_ip=162.142.89.61 local_port=40927 remote_ip=184.105.247.238 remote_port=56098 protocol=SSL rule_id=144 action=Log",
+                "CEF:0|XLog|leader|1.0.2|73af72e4-afd6-43a1-9dfc-c49c8848493c|2025-01-05T18:00:59.482255Z|low|local_ip=63.170.29.219 local_port=42437 remote_ip=198.199.112.81 remote_port=56569 protocol=TCP rule_id=79 action=Allow"
             ],
-            "type": "FakerTypeEnum.WINEVENT"
+            "type": "FakerTypeEnum.CEF"
         }
     }
 }
 ```
-
+#### Using _requiredFields_ Input
+***
+If you want to set a requiredFields list for those fields to be present in the logs. You can use this input with SYSLOG, CEF, LEEF and JSON, you can select one or more of those fields:
+- ACTION
+- ACTION_STATUS
+- ALERT_NAME
+- ALERT_TYPES
+- ANALYSTS
+- APP
+- ATTACHMENT_HASH
+- ATTACK_TYPE
+- COOKIES
+- CVE
+- DATABASE_NAME
+- DESTINATION_LOGIN_ID
+- DURATION
+- DST_DOMAIN
+- DST_HOST
+- DST_URL
+- EMAIL_BODY
+- EMAIL_SUBJECT
+- ENTRY_TYPE
+- ERROR_CODE
+- EVENT_ID
+- EVENT_RECORD_ID
+- FILE_HASH
+- FILE_NAME
+- GUID
+- INCIDENT_TYPES
+- INBOUND_BYTES
+- LOCAL_IP
+- LOCAL_IP_V6
+- LOCAL_PORT
+- LOG_ID
+- METHOD
+- NEW_PROCESS_ID
+- OS
+- OUTBOUND_BYTES
+- PID
+- PRIVILEGE_LIST
+- PROCESS_ID
+- PROTOCOL
+- QUERY
+- QUERY_TYPE
+- RECIPIENT_EMAIL
+- REFERER
+- REMOTE_IP
+- REMOTE_IP_V6
+- REMOTE_PORT
+- RESPONSE_CODE
+- RESPONSE_SIZE
+- RULE_ID
+- SEVERITY
+- SENDER_EMAIL
+- SENSOR
+- SOURCE_NETWORK_ADDRESS
+- SPAM_SCORE
+- SRC_DOMAIN"
+- SRC_HOST
+- SUBJECT_LOGIN_ID
+- TARGET_PID
+- TECHNIQUE
+- TERMS
+- THREAD_ID
+- TRANSMITTED_SERVICES
+- URL
+- USER
+- USER_AGENT
+- WIN_CHILD_PROCESS
+- WIN_CMD
+- WIN_PROCESS
+- WIN_USER_ID
+- UNIX_CHILD_PROCESS
+- UNIX_CMD
+- UNIX_PROCESS
+** A curl example:**
+```bash
+curl --location 'http://localhost:8000' \
+--header 'Content-Type: application/json' \
+--data '{"query":"query MyQuery ($type: FakerTypeEnum!, $requiredFields: [RequiredFieldEnum!]) {\n  generateFakeData(requestInput: {type: $type, requiredFields:$requiredFields}) {\n    count\n    data\n    type\n  }\n}","variables":{"type":"CEF","requiredFields":["REMOTE_IP","REMOTE_PORT","LOCAL_PORT","URL","USER","OS"]}}'
+```
+Example output:
+```json
+{
+    "data": {
+        "generateFakeData": {
+            "count": 1,
+            "data": [
+                "CEF:0|XLog|alone|1.0.4|b0796571-4938-44ca-ac80-24cc05133926|2025-01-05T18:41:22.017094Z|low|remote_ip=194.195.249.215 remote_port=13310 local_port=20860 url=https://example.com/login.php?username=admin&password=pass user=christensenjonathan os=Arch Linux 2024.09"
+            ],
+            "type": "FakerTypeEnum.CEF"
+        }
+    }
+}
+```
 #### Using _Observables_ Input
 ***
-If you want to set an Observables list to pick from. You can use this input with SYSLOG, CEF, LEEF, WINEVENT, JSON, and Incident. The WINEVENT logs currently support only the following observables:
-- event_id
-- process
+If you want to set an Observables list to pick from. You can use this input with SYSLOG, CEF, LEEF and JSON. 
+- local_ip
+- remote_ip
+- local_ip_v6
+- remote_ip_v6
 - src_host
+- dst_host
+- src_domain
+- dst_domain
+- sender_email
+- recipient_email
+- email_subject
+- email_body
+- url
+- local_port
+- remote_port
+- protocol
+- inbound_bytes
+- outbound_bytes
+- app
+- os
 - user
-- cmd
-- src_ip
+- cve
 - file_name
+- file_hash
+- win_cmd
+- unix_cmd
+- win_process
+- win_child_process
+- unix_process
+- unix_child_process
+- technique
+- entry_type
+- severity
+- sensor
+- action
+- event_id
+- error_code
+- terms
+- incident_types
+- analysts
+- alert_types
+- alert_name
+- action_status
+- query_type
+- database_name
+- query
 
 **A curl example:**
 ```bash

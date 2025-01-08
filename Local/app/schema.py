@@ -51,7 +51,7 @@ class Query:
             datetime_obj = None
         observables_init = Observables()
         observables = request_input.observables_dict
-        required_fields = request_input.observables_dict
+        required_fields = request_input.required_fields
         if required_fields:
             required_fields = ",".join([field.value for field in request_input.required_fields])
         if observables:
@@ -73,12 +73,12 @@ class Query:
             data = Events.leef(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
                             vendor=vendor, product=request_input.product, version=request_input.version,
                             required_fields=required_fields)
-        elif request_input.type == FakerTypeEnum.WINEVENT:
-            data = Events.winevent(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.JSON:
             data = Events.json(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj,
                             vendor=vendor, product=request_input.product, version=request_input.version,
                             required_fields=required_fields)
+        elif request_input.type == FakerTypeEnum.WINEVENT:
+            data = Events.winevent(count=request_input.count, datetime_iso=datetime_obj, observables=observables_obj)
         elif request_input.type == FakerTypeEnum.Incident:
             data = Events.incidents(count=request_input.count, fields=request_input.fields, datetime_iso=datetime_obj,
                                     observables=observables_obj, vendor=vendor, product=request_input.product,
@@ -94,7 +94,7 @@ class Query:
             for item in raw_data:
                 if "datetime_iso" in item:
                     timestamp = item.pop("datetime_iso")
-                    datetime_obj = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
+                    datetime_obj = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
                     event_timestamp = int(datetime_obj.timestamp() * 1000)
                     item["event_timestamp"] = event_timestamp
                 new_item = {}
