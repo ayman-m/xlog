@@ -43,7 +43,7 @@ export const AuroraBackground = ({
         />
       </div>
       <div className="absolute inset-0 grid-overlay" />
-      <div className="relative z-10 w-full">{children}</div>
+      <div className="relative z-10 h-full min-h-0 w-full">{children}</div>
     </div>
   );
 };

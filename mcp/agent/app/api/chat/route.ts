@@ -337,6 +337,7 @@ When calling xlog_create_data_worker:
 - end_time: End time for logs (format: "HH:MM:SS")
 - DO NOT include timestamp parameters by default
 - ONLY include if user specifically asks for historical timestamps or custom time ranges
+- NEVER invent or infer custom timestamps; if the user does not ask, omit all timestamp fields
 
 **required_fields**: Array of field enums ONLY
 - NEVER include "VENDOR" or "PRODUCT" in required_fields
@@ -602,7 +603,7 @@ export async function POST(request: NextRequest) {
         let finalText: string[] = [];
         let toolCalls: Array<{ tool: string; args: Record<string, unknown>; result: string }> = [];
 
-        for (let step = 0; step < 8; step++) {
+        for (let step = 0; step < 20; step++) {
           const candidate = response.candidates?.[0];
           const parts: GeminiPart[] = candidate?.content?.parts || [];
 
@@ -663,8 +664,14 @@ export async function POST(request: NextRequest) {
           logDebug('model', 'Received follow-up response');
         }
 
+        const finalResponse = finalText.join('\n').trim();
+        if (!finalResponse) {
+          send('delta', {
+            text: 'No model response was returned. Review the tool results above or try a smaller request.',
+          });
+        }
         send('done', {
-          response: finalText.join('\n'),
+          response: finalResponse,
           toolCalls,
         });
       } catch (error) {

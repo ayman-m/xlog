@@ -176,7 +176,7 @@ export default function SkillsPage() {
   }, []);
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-6">
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -202,8 +202,8 @@ export default function SkillsPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
-        <Card className="glass-panel">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <Card className="glass-panel flex h-full min-h-0 flex-col">
           <CardHeader>
             <CardTitle>{activeTab === "list" ? "Available Skills" : "Create a New Skill"}</CardTitle>
             <CardDescription>
@@ -212,9 +212,9 @@ export default function SkillsPage() {
                 : "Add a new markdown skill to the MCP skills library."}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0 overflow-y-auto">
             {activeTab === "list" ? (
-              <div className="space-y-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex flex-wrap gap-3">
                   <Input
                     value={filter}
@@ -226,7 +226,7 @@ export default function SkillsPage() {
                   </Button>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-3 pr-1">
                   {filteredSkills.length === 0 && (
                     <p className="text-sm text-slate-500">No skills found.</p>
                   )}
@@ -259,7 +259,7 @@ export default function SkillsPage() {
                 </div>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="flex h-full flex-col gap-4">
                 <div className="grid gap-3 md:grid-cols-2">
                   <div>
                     <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
@@ -288,7 +288,7 @@ export default function SkillsPage() {
                     />
                   </div>
                 </div>
-                <div>
+                <div className="flex min-h-0 flex-1 flex-col">
                   <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
                     Content
                   </label>
@@ -296,6 +296,7 @@ export default function SkillsPage() {
                     value={newContent}
                     onChange={(event) => setNewContent(event.target.value)}
                     placeholder="# Skill: My Skill"
+                    className="flex-1"
                   />
                 </div>
                 <Button onClick={createSkill} disabled={loading}>
@@ -306,27 +307,27 @@ export default function SkillsPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-panel">
+        <Card className="glass-panel flex h-full min-h-0 flex-col">
           <CardHeader>
             <CardTitle>{editing ? "Editing Skill" : "Skill Preview"}</CardTitle>
             <CardDescription>
               {selected ? selected.file_path : "Select a skill to view its content."}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0 overflow-y-auto">
             {!selected && (
               <p className="text-sm text-slate-500">
                 Choose a skill from the list to view or edit its markdown content.
               </p>
             )}
             {selected && (
-              <div className="space-y-3">
+              <div className="flex flex-col gap-3">
                 {editing ? (
                   <>
                     <Textarea
                       value={content}
                       onChange={(event) => setContent(event.target.value)}
-                      className="h-[560px]"
+                      className="min-h-0 flex-1"
                     />
                     <div className="flex flex-wrap gap-2">
                       <Button onClick={saveSkill} disabled={loading}>
@@ -338,7 +339,7 @@ export default function SkillsPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="h-[560px] overflow-y-auto rounded-2xl border border-slate-200 bg-white/90 p-6">
+                  <div className="rounded-2xl border border-slate-200 bg-white/90 p-6">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{

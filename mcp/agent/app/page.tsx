@@ -35,6 +35,46 @@ export default function Home() {
     () => [...messages].reverse().find((msg) => msg.role === 'assistant'),
     [messages]
   );
+  const toolErrorSignals = useMemo(() => {
+    const calls = latestAssistant?.toolCalls || [];
+    const errors: Array<{ tool: string; label: string }> = [];
+    for (const call of calls) {
+      const toolName = String(call.tool || '');
+      const resultText = String(call.result || '');
+      if (!resultText) continue;
+      const lowerTool = toolName.toLowerCase();
+      const lowerResult = resultText.toLowerCase();
+      const errorLines = resultText
+        .split('\n')
+        .map((line) => line.trim())
+        .filter((line) => /error|errors|exception|failed|failure/.test(line.toLowerCase()));
+      const hasError = errorLines.length > 0;
+      if (!hasError) continue;
+
+      let label = '';
+      if (lowerTool.includes('graphql')) {
+        label = 'GraphQL';
+      } else if (lowerTool.includes('caldera')) {
+        label = 'CALDERA';
+      } else if (lowerTool.includes('xsiam')) {
+        label = 'XSIAM';
+      } else {
+        const errorText = errorLines.join(' ').toLowerCase();
+        if (errorText.includes('graphql')) {
+          label = 'GraphQL';
+        } else if (errorText.includes('caldera')) {
+          label = 'CALDERA';
+        } else if (errorText.includes('xsiam')) {
+          label = 'XSIAM';
+        }
+      }
+
+      if (label) {
+        errors.push({ tool: toolName, label });
+      }
+    }
+    return errors;
+  }, [latestAssistant?.toolCalls]);
 
   const handleExport = () => {
     if (!activeSession) return;
@@ -236,8 +276,8 @@ export default function Home() {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-6">
+      <header className="flex shrink-0 flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
             XLog Security Studio
@@ -252,8 +292,8 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        <Card className="glass-panel">
+      <div className="grid flex-1 min-h-0 grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <Card className="glass-panel flex min-h-0 flex-col">
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -267,9 +307,9 @@ export default function Home() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-6">
-              <div className="max-h-[55vh] space-y-6 overflow-y-auto pr-2">
+          <CardContent className="flex-1 min-h-0">
+            <div className="flex h-full flex-col gap-6 min-h-0">
+              <div className="min-h-0 flex-1 space-y-6 overflow-y-auto pr-2">
                 {messages.length === 0 && (
                   <div className="rounded-2xl border border-dashed border-slate-200 bg-white/80 p-6 text-slate-600">
                     <p className="text-sm font-medium">Start with a prompt:</p>
@@ -369,56 +409,38 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <div className="flex flex-col gap-6">
-          <Card className="glass-panel">
-            <CardHeader>
-              <CardTitle>Live telemetry</CardTitle>
-              <CardDescription>See each MCP and model step as it happens.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {(latestAssistant?.debugSteps || []).length === 0 && (
-                  <p className="text-sm text-slate-500">No telemetry yet. Send a prompt to begin.</p>
-                )}
-                {latestAssistant?.debugSteps?.map((step, idx) => (
-                  <div key={idx} className="rounded-xl border border-slate-200 bg-white/80 p-3">
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <span className="font-mono">{step.time}</span>
-                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase">
-                        {step.stage}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm text-slate-700">{step.detail}</p>
+        <Card className="glass-panel flex min-h-0 flex-1 flex-col">
+          <CardHeader>
+            <CardTitle>Live telemetry</CardTitle>
+            <CardDescription>See each MCP and model step as it happens.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex-1 min-h-0 overflow-hidden">
+            <div className="h-full space-y-3 overflow-y-auto pr-1">
+              {(latestAssistant?.debugSteps || []).length === 0 && toolErrorSignals.length === 0 && (
+                <p className="text-sm text-slate-500">No telemetry yet. Send a prompt to begin.</p>
+              )}
+              {toolErrorSignals.map((signal, idx) => (
+                <div
+                  key={`${signal.tool}-${idx}`}
+                  className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700"
+                >
+                  Tool error detected ({signal.label})
+                </div>
+              ))}
+              {latestAssistant?.debugSteps?.map((step, idx) => (
+                <div key={idx} className="rounded-xl border border-slate-200 bg-white/80 p-3">
+                  <div className="flex items-center justify-between text-xs text-slate-500">
+                    <span className="font-mono">{step.time}</span>
+                    <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold uppercase">
+                      {step.stage}
+                    </span>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="glass-panel">
-            <CardHeader>
-              <CardTitle>Tool activity</CardTitle>
-              <CardDescription>Quick scan of the most recent tool calls.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {(latestAssistant?.toolCalls || []).length === 0 && (
-                  <p className="text-sm text-slate-500">No tool calls yet.</p>
-                )}
-                {latestAssistant?.toolCalls?.map((call, idx) => (
-                  <details key={idx} className="rounded-xl border border-slate-200 bg-white/80 p-3">
-                    <summary className="cursor-pointer text-sm font-semibold text-slate-800">
-                      {call.tool}
-                    </summary>
-                    <pre className="mt-2 max-h-32 overflow-y-auto rounded-lg bg-slate-100 p-2 text-[11px] text-slate-700">
-                      {call.result || 'Awaiting result...'}
-                    </pre>
-                  </details>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <p className="mt-2 text-sm text-slate-700">{step.detail}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

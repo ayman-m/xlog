@@ -29,9 +29,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full overflow-hidden">
       <body
-        className={`${spaceGrotesk.variable} ${plexMono.variable} min-h-screen bg-[hsl(var(--background))] font-sans text-[hsl(var(--foreground))]`}
+        className={`${spaceGrotesk.variable} ${plexMono.variable} h-full overflow-hidden bg-[hsl(var(--background))] font-sans text-[hsl(var(--foreground))]`}
       >
         <ChatSessionProvider>
           <AuthGate>{children}</AuthGate>

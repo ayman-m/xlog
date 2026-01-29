@@ -18,10 +18,15 @@ if [ ! -f ".env.local" ]; then
 fi
 
 # Check if GEMINI_API_KEY is set (or GOOGLE_APPLICATION_CREDENTIALS)
+# Allow local UI-only testing without keys unless REQUIRE_LLM_KEY=1
 if ! grep -q "GEMINI_API_KEY=" .env.local && ! grep -q "GOOGLE_APPLICATION_CREDENTIALS=" .env.local; then
-    echo "⚠️  GEMINI_API_KEY not configured in .env.local"
-    echo "   Please add your Gemini API key to .env.local"
-    exit 1
+    if [ "${REQUIRE_LLM_KEY}" = "1" ]; then
+        echo "⚠️  GEMINI_API_KEY not configured in .env.local"
+        echo "   Please add your Gemini API key to .env.local"
+        exit 1
+    else
+        echo "⚠️  No LLM credentials configured; continuing for UI-only testing."
+    fi
 fi
 
 # Check if node_modules exists
