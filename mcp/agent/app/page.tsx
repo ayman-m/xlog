@@ -35,46 +35,6 @@ export default function Home() {
     () => [...messages].reverse().find((msg) => msg.role === 'assistant'),
     [messages]
   );
-  const toolErrorSignals = useMemo(() => {
-    const calls = latestAssistant?.toolCalls || [];
-    const errors: Array<{ tool: string; label: string }> = [];
-    for (const call of calls) {
-      const toolName = String(call.tool || '');
-      const resultText = String(call.result || '');
-      if (!resultText) continue;
-      const lowerTool = toolName.toLowerCase();
-      const lowerResult = resultText.toLowerCase();
-      const errorLines = resultText
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => /error|errors|exception|failed|failure/.test(line.toLowerCase()));
-      const hasError = errorLines.length > 0;
-      if (!hasError) continue;
-
-      let label = '';
-      if (lowerTool.includes('graphql')) {
-        label = 'GraphQL';
-      } else if (lowerTool.includes('caldera')) {
-        label = 'CALDERA';
-      } else if (lowerTool.includes('xsiam')) {
-        label = 'XSIAM';
-      } else {
-        const errorText = errorLines.join(' ').toLowerCase();
-        if (errorText.includes('graphql')) {
-          label = 'GraphQL';
-        } else if (errorText.includes('caldera')) {
-          label = 'CALDERA';
-        } else if (errorText.includes('xsiam')) {
-          label = 'XSIAM';
-        }
-      }
-
-      if (label) {
-        errors.push({ tool: toolName, label });
-      }
-    }
-    return errors;
-  }, [latestAssistant?.toolCalls]);
 
   const handleExport = () => {
     if (!activeSession) return;
@@ -416,17 +376,9 @@ export default function Home() {
           </CardHeader>
           <CardContent className="flex-1 min-h-0 overflow-hidden">
             <div className="h-full space-y-3 overflow-y-auto pr-1">
-              {(latestAssistant?.debugSteps || []).length === 0 && toolErrorSignals.length === 0 && (
+              {(latestAssistant?.debugSteps || []).length === 0 && (
                 <p className="text-sm text-slate-500">No telemetry yet. Send a prompt to begin.</p>
               )}
-              {toolErrorSignals.map((signal, idx) => (
-                <div
-                  key={`${signal.tool}-${idx}`}
-                  className="rounded-xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700"
-                >
-                  Tool error detected ({signal.label})
-                </div>
-              ))}
               {latestAssistant?.debugSteps?.map((step, idx) => (
                 <div key={idx} className="rounded-xl border border-slate-200 bg-white/80 p-3">
                   <div className="flex items-center justify-between text-xs text-slate-500">

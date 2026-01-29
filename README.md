@@ -11,6 +11,8 @@
 # XLog
 XLog is a security testing and simulation platform that combines synthetic log generation, scenario-based attack telemetry, and AI-orchestrated workflows through MCP.  
 
+![XLog Agent UI](img/xlog_demo.jpg)
+
 
 ## Capabilities
 
