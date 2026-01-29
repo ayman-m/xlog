@@ -6,13 +6,13 @@
 [![scanned-with](https://img.shields.io/badge/Scanned%20with-gree)]()
 [![snyk](https://snyk.io/test/github/my-soc/Rosetta/badge.svg)](https://snyk.io/test/github/my-soc/Rosetta)
 ![codeql](https://github.com/my-soc/Rosetta/actions/workflows/github-code-scanning/codeql/badge.svg)
-[![slack-community](https://img.shields.io/badge/Slack-4A154C?logo=slack&logoColor=white)](https://go-rosetta.slack.com)
 
 <img align="left" src="img/logo.png" width="30%" alt="Xlog">
 
 # XLog
 
-XLog is a security testing and simulation platform that combines synthetic log generation, scenario-based attack telemetry, and AI-orchestrated workflows through MCP.
+XLog is a security testing and simulation platform that combines synthetic log generation, scenario-based attack telemetry, and AI-orchestrated workflows through MCP.  
+
 
 ## Capabilities
 
