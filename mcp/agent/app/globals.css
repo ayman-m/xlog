@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  --background: 210 33% 98%;
+  --foreground: 222 22% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 22% 12%;
+  --muted: 214 20% 95%;
+  --muted-foreground: 215 16% 45%;
+  --border: 214 18% 88%;
+  --primary: 215 90% 45%;
+  --primary-foreground: 0 0% 100%;
+  --ring: 215 90% 50%;
+  --radius: 0.9rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-[hsl(var(--background))] text-[hsl(var(--foreground))] antialiased;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.grid-overlay {
+  background-image: radial-gradient(
+      circle at 10% 20%,
+      rgba(59, 130, 246, 0.12),
+      transparent 42%
+    ),
+    radial-gradient(circle at 90% 0%, rgba(14, 165, 233, 0.18), transparent 48%),
+    linear-gradient(to bottom right, rgba(15, 23, 42, 0.04), transparent);
+}

@@ -1,0 +1,74 @@
+
+version: '3'
+services:
+
+  xlog:
+    container_name: xlog
+    image: aymanam/xlog:amd64-latest
+    restart: unless-stopped
+    ports:
+      - "8999:8000"
+    environment:
+      - WEBHOOK_KEY
+      - WEBHOOK_ENDPOINT
+      - WORKERS_NUMBER
+      - LOGGING_DIR
+      - LOGGING_STORAGE_SIZE
+      - LOGGING_TRUNCATE_LIMIT
+      - XSIAM_MANDATORY_PARSED_FIELDS
+      - XSIAM_OPTIONAL_PARSED_FIELDS
+    volumes:
+      - xlog:/scenarios
+
+  xlog-mcp:
+    container_name: xlog_mcp
+    image: aymanam/xlogmcp:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - XLOG_URL=http://xlog:8000
+      - XLOG_PORT=8000
+      - MCP_TRANSPORT
+      - MCP_HOST
+      - MCP_PORT
+      - MCP_PATH
+      - LOG_LEVEL=INFO
+      - CORTEX_MCP_PAPI_URL
+      - CORTEX_MCP_PAPI_AUTH_HEADER
+      - CORTEX_MCP_PAPI_AUTH_ID
+      - PLAYGROUND_ID
+      - WEBHOOK_KEY
+      - WEBHOOK_ENDPOINT
+      - REBUILD_XQL_CHROMA
+      - CALDERA_URL
+      - CALDERA_API_KEY
+      - TECHNOLOGY_STACK
+    volumes:
+      - xlog_mcp_skills:/app/skills
+    depends_on:
+      - xlog
+  
+  xlog-agent:
+    image: aymanam/xlogagentui:latest
+    container_name: xlog_agent
+    environment:
+      - GEMINI_API_KEY
+      - GEMINI_MODEL
+      - GOOGLE_APPLICATION_CREDENTIALS
+      - MCP_URL=http://xlog-mcp:8080/api/v1/stream/mcp
+      - MCP_TOKEN
+      - SSL_CERT_PEM
+      - SSL_KEY_PEM
+      - UI_USER
+      - UI_PASSWORD
+    ports:
+      - "3000:3000"
+    depends_on:
+      - xlog-mcp
+    restart: unless-stopped
+
+
+volumes:
+  xlog:
+  xlog_mcp_skills:

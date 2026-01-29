@@ -1,0 +1,20 @@
+"""Tools temporarily removed from MCP registration."""
+
+from usecase.builtin_components import caldera_tools, data_faker, scenarios
+
+# XLog tools
+xlog_generate_fake_data = data_faker.xlog_generate_fake_data
+xlog_generate_scenario_fake_data = scenarios.xlog_generate_scenario_fake_data
+
+# Caldera tools
+caldera_health_check = caldera_tools.caldera_health_check
+caldera_get_ability_by_id = caldera_tools.caldera_get_ability_by_id
+caldera_get_adversary_by_ability_id = caldera_tools.caldera_get_adversary_by_ability_id
+caldera_get_adversary_by_id = caldera_tools.caldera_get_adversary_by_id
+caldera_get_agent_by_paw = caldera_tools.caldera_get_agent_by_paw
+caldera_get_operation_links = caldera_tools.caldera_get_operation_links
+caldera_get_operation_link = caldera_tools.caldera_get_operation_link
+caldera_get_planner_by_id = caldera_tools.caldera_get_planner_by_id
+caldera_get_plugin_by_name = caldera_tools.caldera_get_plugin_by_name
+caldera_get_operation_potential_links_by_paw = caldera_tools.caldera_get_operation_potential_links_by_paw
+caldera_get_schedule_by_id = caldera_tools.caldera_get_schedule_by_id
