@@ -99,6 +99,13 @@ The GraphQL endpoint is served at `http://localhost:8000/`.
 - `fields`, `observablesDict`, `requiredFields`, `datetimeIso`
 - `verifySsl` (default `false`)
 
+#### XSIAM Custom HTTP Collector Requirements
+
+When sending logs to a XSIAM custom HTTP collector (for example, alongside a SYSLOG destination), configure the collector with:
+
+- **Compression**: `uncompressed`
+- **Log format**: `json`
+
 #### `ScenarioWorkerCreateInput`
 
 - `scenario` (required): filename without `.json` in `scenarios/ready/`
